@@ -47,4 +47,10 @@ public class TeamService {
 		return teamRepository.findTeamByTeamName(teamName)
 			.orElseThrow(() -> new NotFoundException("해당 팀 명으로 존재하지 않습니다."));
 	}
+
+	public void setTeamMember(List<User> userList, String teamName) {
+		Team team = getTeam(teamName);
+		userList.forEach(user -> team.getMembers().add(user));
+		teamRepository.save(team);
+	}
 }

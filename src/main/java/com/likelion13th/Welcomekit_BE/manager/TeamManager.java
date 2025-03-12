@@ -1,5 +1,8 @@
 package com.likelion13th.Welcomekit_BE.manager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -7,6 +10,7 @@ import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateTeamRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.PutTeamExecutivesRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.PutTeamLeaderRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.PutTeamMemberRequest;
 import com.likelion13th.Welcomekit_BE.service.TeamService;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
@@ -36,6 +40,17 @@ public class TeamManager {
 		leader.setTeam(teamService.getTeam(putTeamLeaderRequest.getTeamName()));
 		userService.save(leader);
 		teamService.setLeader(leader, putTeamLeaderRequest.getTeamName());
+	}
+
+	public void setTeamMember(PutTeamMemberRequest putTeamMemberRequest) {
+		List<User> userList = new ArrayList<>();
+		putTeamMemberRequest.getExecutiveStudentNumList().forEach(studentNum -> {
+			User user = userService.getUserByStudentName(studentNum);
+			user.setTeam(teamService.getTeam(putTeamMemberRequest.getTeamName()));
+			userService.save(user);
+			userList.add(userService.getUserByStudentName(studentNum));
+		});
+		teamService.setTeamMember(userList, putTeamMemberRequest.getTeamName());
 	}
 
 }

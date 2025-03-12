@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateTeamRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.PutTeamExecutivesRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.PutTeamLeaderRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.PutTeamMemberRequest;
 import com.likelion13th.Welcomekit_BE.manager.TeamManager;
 
 import lombok.RequiredArgsConstructor;
@@ -37,5 +38,11 @@ public class TeamController {
 	ResponseEntity<?> setLeader(@RequestBody PutTeamLeaderRequest putTeamLeaderRequest) {
 		teamManager.setLeader(putTeamLeaderRequest);
 		return ResponseEntity.ok("성공적으로 팀장이 등록되었습니다.");
+	}
+
+	@PostMapping("/teamMember")
+	ResponseEntity<?> setTeamMember(@RequestBody PutTeamMemberRequest putTeamMemberRequest) {
+		teamManager.setTeamMember(putTeamMemberRequest);
+		return ResponseEntity.ok("성공적으로 팀원이 등록되었습니다.");
 	}
 }
