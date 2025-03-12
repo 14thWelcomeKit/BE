@@ -1,11 +1,16 @@
 package com.likelion13th.Welcomekit_BE.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import com.likelion13th.Welcomekit_BE.domain.User;
+import com.likelion13th.Welcomekit_BE.domain.UserType;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.GetAllBabyLionResponse;
 import com.likelion13th.Welcomekit_BE.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +31,37 @@ public class UserService {
 		user.setUserType(createUserRequest.getUserType());
 		user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
 		user.setStudentNum(createUserRequest.getStudentNum());
+		userRepository.save(user);
+	}
+
+	public User getUserByStudentName(String studentName) {
+		return userRepository.findUserByStudentNum(studentName)
+			.orElseThrow(() -> new NotFoundException("해당 학번으로 존재하는 사람이 없습니다."));
+	}
+
+	public List<GetAllBabyLionResponse> getTotalBabyLion() {
+		return userRepository.findAll().stream().filter(user -> user.getUserType() == UserType.BABY_LION).map(user -> {
+			GetAllBabyLionResponse babyLionResponse = new GetAllBabyLionResponse();
+			babyLionResponse.setId(user.getId());
+			babyLionResponse.setName(user.getUserName());
+			babyLionResponse.setStudentNum(user.getStudentNum());
+			babyLionResponse.setTeamName(user.getTeam().getTeamName());
+			return babyLionResponse;
+		}).toList();
+	}
+
+	public List<GetAllBabyLionResponse> getTotalAdmin() {
+		return userRepository.findAll().stream().filter(user -> user.getUserType() == UserType.ADMIN).map(user -> {
+			GetAllBabyLionResponse babyLionResponse = new GetAllBabyLionResponse();
+			babyLionResponse.setId(user.getId());
+			babyLionResponse.setName(user.getUserName());
+			babyLionResponse.setStudentNum(user.getStudentNum());
+			babyLionResponse.setTeamName(user.getTeam().getTeamName());
+			return babyLionResponse;
+		}).toList();
+	}
+
+	public void save(User user) {
 		userRepository.save(user);
 	}
 }

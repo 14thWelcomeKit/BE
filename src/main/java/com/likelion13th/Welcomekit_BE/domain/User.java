@@ -1,20 +1,7 @@
 package com.likelion13th.Welcomekit_BE.domain;
 
-import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity(name = "user")
 @Getter
@@ -36,6 +23,11 @@ public class User {
 	@Column(name = "student_num", nullable = false)
 	private String studentNum;
 
-	@Column(name = "user_type")
+	@Enumerated(EnumType.STRING)
+	@Column(name = "user_type", nullable = false)
 	private UserType userType;
+
+	@ManyToOne
+	@JoinColumn(name = "team_id")
+	private Team team;
 }
