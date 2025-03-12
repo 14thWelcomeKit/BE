@@ -45,7 +45,7 @@ public class UserService {
 			babyLionResponse.setId(user.getId());
 			babyLionResponse.setName(user.getUserName());
 			babyLionResponse.setStudentNum(user.getStudentNum());
-			babyLionResponse.setTeamName(user.getTeam().getTeamName());
+			babyLionResponse.setTeamName(user.getTeam() != null ? user.getTeam().getTeamName() : null);
 			return babyLionResponse;
 		}).toList();
 	}
@@ -56,7 +56,7 @@ public class UserService {
 			babyLionResponse.setId(user.getId());
 			babyLionResponse.setName(user.getUserName());
 			babyLionResponse.setStudentNum(user.getStudentNum());
-			babyLionResponse.setTeamName(user.getTeam().getTeamName());
+			babyLionResponse.setTeamName(user.getTeam() != null ? user.getTeam().getTeamName() : null);
 			return babyLionResponse;
 		}).toList();
 	}
