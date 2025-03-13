@@ -3,6 +3,7 @@ package com.likelion13th.Welcomekit_BE.service;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
@@ -17,6 +18,7 @@ import com.google.zxing.common.BitMatrix;
 import com.likelion13th.Welcomekit_BE.domain.Attendance;
 import com.likelion13th.Welcomekit_BE.domain.AttendanceSession;
 import com.likelion13th.Welcomekit_BE.domain.User;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.MyAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.domain.enums.AttendanceStatus;
 import com.likelion13th.Welcomekit_BE.repository.AttendanceRepository;
 import com.likelion13th.Welcomekit_BE.repository.AttendanceSessionRepository;
@@ -91,5 +93,17 @@ public class AttendanceSessionService {
 
 		attendanceRepository.save(attendance);
 		return user.getUserName() + "님, " + (status == AttendanceStatus.PRESENT ? "출석 완료" : "지각 처리되었습니다.");
+	}
+
+	public List<MyAttendanceResponse> getMyAttendance(User user) {
+		List<Attendance> myAttendances = attendanceRepository.findAllByUserOrderByAttendanceTime(user);
+		List<MyAttendanceResponse> list = myAttendances.stream().map(myAttendance -> {
+			MyAttendanceResponse myAttendanceResponse = new MyAttendanceResponse();
+			myAttendanceResponse.setAttendanceStatus(myAttendance.getStatus());
+			myAttendanceResponse.setDate(myAttendance.getAttendanceSession().getSessionDate().toLocalDate());
+			return myAttendanceResponse;
+		}).toList();
+		System.out.println("list = " + list);
+		return list;
 	}
 }

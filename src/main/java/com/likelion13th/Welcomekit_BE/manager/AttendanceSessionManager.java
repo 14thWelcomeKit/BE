@@ -1,10 +1,13 @@
 package com.likelion13th.Welcomekit_BE.manager;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.likelion13th.Welcomekit_BE.domain.AttendanceSession;
 import com.likelion13th.Welcomekit_BE.domain.User;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.MyAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.service.AttendanceSessionService;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
@@ -28,5 +31,10 @@ public class AttendanceSessionManager {
 	public String markAttendance(String studentNum, Long sessionId) {
 		User user = userService.getUserByStudentName(studentNum);
 		return attendanceSessionService.markAttendance(user, sessionId);
+	}
+
+	public List<MyAttendanceResponse> getMyAttendance(String studentNum) {
+		User user = userService.getUserByStudentName(studentNum);
+		return attendanceSessionService.getMyAttendance(user);
 	}
 }

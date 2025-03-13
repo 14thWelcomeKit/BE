@@ -2,9 +2,12 @@ spring:
   application:
     name: Welcomekit_BE
   datasource:
-    url: jdbc:mysql://localhost:3306/welcomekit
+#    url: jdbc:mysql://localhost:3306/welcomekit
+#    username: root
+#    password: ohw62459930!
+    url: jdbc:mysql://3.36.132.65:3306/welcomekit
     username: root
-    password: ohw62459930!
+    password: rootpassword
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     properties:
@@ -16,6 +19,9 @@ spring:
 jwt:
   secret: 7dc99f011b193840a4366ee564a24b8b49f46182db7da914772761c547b0569dfdba1e376ab1218dca2b9c055bcc48fdbee8ce95f52a214778a26582bbd72ff4
   expiration: 604800000
+
+logging.level:
+  org.hibernate.SQL: debug
 
 springdoc:
   swagger-ui:
