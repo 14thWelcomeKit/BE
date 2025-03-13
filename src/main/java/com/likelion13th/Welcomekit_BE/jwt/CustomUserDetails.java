@@ -11,13 +11,13 @@ import com.likelion13th.Welcomekit_BE.domain.User;
 
 public class CustomUserDetails implements UserDetails {
 
-	private final String username;
+	private final String studentNum;
 	private final String password;
 	private final Collection<? extends GrantedAuthority> authorities;
 
 	public CustomUserDetails(User user) {
-		this.username = user.getUserName();
 		this.password = user.getPassword();
+		this.studentNum = user.getStudentNum();
 		this.authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")); // 권한 설정 필요 시 추가
 	}
 
@@ -33,7 +33,7 @@ public class CustomUserDetails implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		return username;
+		return studentNum;
 	}
 
 	@Override

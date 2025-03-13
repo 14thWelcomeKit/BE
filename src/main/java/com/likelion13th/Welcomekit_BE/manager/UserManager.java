@@ -3,8 +3,10 @@ package com.likelion13th.Welcomekit_BE.manager;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetAllBabyLionResponse;
 import com.likelion13th.Welcomekit_BE.service.UserService;
@@ -21,11 +23,13 @@ public class UserManager {
 		userService.createUser(createUserRequest);
 	}
 
-	public List<GetAllBabyLionResponse> getTotalBabyLion() {
-		return userService.getTotalBabyLion();
+	public List<GetAllBabyLionResponse> getTotalBabyLion(UserDetails userDetails) {
+		User user = userService.getUserByStudentName(userDetails.getUsername());
+		return userService.getTotalBabyLion(user);
 	}
 
-	public List<GetAllBabyLionResponse> getTotalAdmin() {
-		return userService.getTotalAdmin();
+	public List<GetAllBabyLionResponse> getTotalAdmin(UserDetails userDetails) {
+		User user = userService.getUserByStudentName(userDetails.getUsername());
+		return userService.getTotalAdmin(user);
 	}
 }

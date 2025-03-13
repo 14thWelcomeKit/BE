@@ -14,9 +14,11 @@ import com.likelion13th.Welcomekit_BE.domain.dto.response.GetAllBabyLionResponse
 import com.likelion13th.Welcomekit_BE.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
 	@Autowired
@@ -39,7 +41,11 @@ public class UserService {
 			.orElseThrow(() -> new NotFoundException("해당 학번으로 존재하는 사람이 없습니다."));
 	}
 
-	public List<GetAllBabyLionResponse> getTotalBabyLion() {
+	public List<GetAllBabyLionResponse> getTotalBabyLion(User admin) {
+		if (admin.getUserType() != UserType.ADMIN) {
+			throw new RuntimeException("아기사자는 조회할수없습니다!");
+		}
+		log.info("아기사자 조회");
 		return userRepository.findAll().stream().filter(user -> user.getUserType() == UserType.BABY_LION).map(user -> {
 			GetAllBabyLionResponse babyLionResponse = new GetAllBabyLionResponse();
 			babyLionResponse.setId(user.getId());
@@ -50,7 +56,11 @@ public class UserService {
 		}).toList();
 	}
 
-	public List<GetAllBabyLionResponse> getTotalAdmin() {
+	public List<GetAllBabyLionResponse> getTotalAdmin(User admin) {
+		if (admin.getUserType() != UserType.ADMIN) {
+			throw new RuntimeException("아기사자는 조회할수없습니다!");
+		}
+		log.debug("운영진 조회");
 		return userRepository.findAll().stream().filter(user -> user.getUserType() == UserType.ADMIN).map(user -> {
 			GetAllBabyLionResponse babyLionResponse = new GetAllBabyLionResponse();
 			babyLionResponse.setId(user.getId());

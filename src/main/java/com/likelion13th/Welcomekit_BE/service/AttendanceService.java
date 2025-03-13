@@ -20,7 +20,9 @@ import lombok.RequiredArgsConstructor;
 public class AttendanceService {
 
 	public void generateQR(HttpServletResponse response) {
-		String qrUrl = "http://localhost:8080/api/attendance/success";
+		// 현재 날짜와 시간을 포함하여 QR URL 생성
+		String timestamp = String.valueOf(System.currentTimeMillis()); // 밀리초 기준 timestamp
+		String qrUrl = "http://localhost:8080/api/attendance/success?timestamp=" + timestamp;
 
 		int width = 300;
 		int height = 300;

@@ -2,6 +2,8 @@ package com.likelion13th.Welcomekit_BE.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,12 +30,12 @@ public class UserController {
 	}
 
 	@GetMapping("/total/baby_lion")
-	ResponseEntity<?> getAllBabyLion() {
-		return ResponseEntity.ok(userManager.getTotalBabyLion());
+	ResponseEntity<?> getAllBabyLion(@AuthenticationPrincipal UserDetails userDetails) {
+		return ResponseEntity.ok(userManager.getTotalBabyLion(userDetails));
 	}
 
 	@GetMapping("/total/admin")
-	ResponseEntity<?> getAllAdmin() {
-		return ResponseEntity.ok(userManager.getTotalAdmin());
+	ResponseEntity<?> getAllAdmin(@AuthenticationPrincipal UserDetails userDetails) {
+		return ResponseEntity.ok(userManager.getTotalAdmin(userDetails));
 	}
 }
