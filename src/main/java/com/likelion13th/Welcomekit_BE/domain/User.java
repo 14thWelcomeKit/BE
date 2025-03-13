@@ -1,5 +1,7 @@
 package com.likelion13th.Welcomekit_BE.domain;
 
+import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
+
 import jakarta.persistence.*;
 import lombok.*;
 

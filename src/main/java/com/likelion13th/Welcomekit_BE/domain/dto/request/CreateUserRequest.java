@@ -1,6 +1,6 @@
 package com.likelion13th.Welcomekit_BE.domain.dto.request;
 
-import com.likelion13th.Welcomekit_BE.domain.UserType;
+import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
 
 import lombok.Getter;
 

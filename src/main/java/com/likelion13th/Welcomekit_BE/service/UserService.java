@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
 
 import com.likelion13th.Welcomekit_BE.domain.User;
-import com.likelion13th.Welcomekit_BE.domain.UserType;
+import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetAllBabyLionResponse;
 import com.likelion13th.Welcomekit_BE.repository.UserRepository;
