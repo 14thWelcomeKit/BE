@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetAllBabyLionResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyInfoResponse;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,10 @@ public class UserManager {
 	public List<GetAllBabyLionResponse> getTotalAdmin(UserDetails userDetails) {
 		User user = userService.getUserByStudentName(userDetails.getUsername());
 		return userService.getTotalAdmin(user);
+	}
+
+	public GetMyInfoResponse getMyInfo(UserDetails userDetails) {
+		User user = userService.getUserByStudentName(userDetails.getUsername());
+		return userService.getMyInfo(user);
 	}
 }

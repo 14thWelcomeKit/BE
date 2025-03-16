@@ -40,4 +40,9 @@ public class UserController {
 	ResponseEntity<?> getAllAdmin(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getTotalAdmin(userDetails));
 	}
+
+	@GetMapping("/info")
+	ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
+		return ResponseEntity.ok(userManager.getMyInfo(userDetails));
+	}
 }
