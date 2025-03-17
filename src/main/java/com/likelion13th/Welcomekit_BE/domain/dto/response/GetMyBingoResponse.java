@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class GetMyBingoResponse {
 	private Long id;
-	private BingoEnum mission;
+	private String mission;
 	private Boolean isComplete;
 	private Boolean isRevealed;
 }

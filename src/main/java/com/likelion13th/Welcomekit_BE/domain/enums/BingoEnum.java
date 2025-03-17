@@ -6,8 +6,26 @@ import java.util.Collections;
 import java.util.List;
 
 public enum BingoEnum {
-	MISSION_1, MISSION_2, MISSION_3, MISSION_4, MISSION_5,
-	MISSION_6, MISSION_7, MISSION_8, MISSION_9, MISSION_10;
+	MISSION_1("첫 번째 미션"),
+	MISSION_2("두 번째 미션"),
+	MISSION_3("세 번째 미션"),
+	MISSION_4("네 번째 미션"),
+	MISSION_5("다섯 번째 미션"),
+	MISSION_6("여섯 번째 미션"),
+	MISSION_7("일곱 번째 미션"),
+	MISSION_8("여덟 번째 미션"),
+	MISSION_9("아홉 번째 미션"),
+	MISSION_10("열 번째 미션");
+
+	private final String description;
+
+	BingoEnum(String description) {
+		this.description = description;
+	}
+
+	public String getDescription() {
+		return description;
+	}
 
 	public static List<BingoEnum> getRandomMissions(int count) {
 		List<BingoEnum> missions = new ArrayList<>(Arrays.asList(values()));
