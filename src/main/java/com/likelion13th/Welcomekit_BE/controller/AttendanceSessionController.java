@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.likelion13th.Welcomekit_BE.domain.dto.response.MyAttendanceResponse;
@@ -34,10 +33,9 @@ public class AttendanceSessionController {
 
 	@GetMapping("/success")
 	public ResponseEntity<String> qrSuccess(
-		@AuthenticationPrincipal UserDetails userDetails,
-		@RequestParam Long sessionId
+		@AuthenticationPrincipal UserDetails userDetails
 	) {
-		return ResponseEntity.ok(attendanceSessionManager.markAttendance(userDetails.getUsername(), sessionId));
+		return ResponseEntity.ok(attendanceSessionManager.markAttendance(userDetails.getUsername()));
 	}
 
 	@GetMapping("/my-attendance")
@@ -45,5 +43,10 @@ public class AttendanceSessionController {
 		@AuthenticationPrincipal UserDetails userDetails) {
 		List<MyAttendanceResponse> myAttendance = attendanceSessionManager.getMyAttendance(userDetails.getUsername());
 		return ResponseEntity.ok(myAttendance);
+	}
+
+	@GetMapping("/today/attendance")
+	public ResponseEntity<?> getTodayAttendance(@AuthenticationPrincipal UserDetails userDetails) {
+		return ResponseEntity.ok(attendanceSessionManager.getTodayAttendance(userDetails.getUsername()));
 	}
 }

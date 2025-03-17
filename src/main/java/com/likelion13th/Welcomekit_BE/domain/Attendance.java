@@ -37,12 +37,12 @@ public class Attendance {
 
 	@ManyToOne
 	@JoinColumn(name = "session_id", nullable = false)
-	private AttendanceSession attendanceSession; // 새로운 출석 세션과 연결
+	private AttendanceSession attendanceSession;
 
-	@Column(name = "attendance_time", nullable = false)
-	private LocalDateTime attendanceTime; // 출석 시간
+	@Column(name = "attendance_time")
+	private LocalDateTime attendanceTime;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
-	private AttendanceStatus status;  // 출석 상태 (출석 / 지각 / 결석)
+	private AttendanceStatus status;
 }

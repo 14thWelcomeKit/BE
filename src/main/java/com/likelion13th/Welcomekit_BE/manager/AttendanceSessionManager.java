@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.likelion13th.Welcomekit_BE.domain.AttendanceSession;
 import com.likelion13th.Welcomekit_BE.domain.User;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.GetTodayAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.MyAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.service.AttendanceSessionService;
 import com.likelion13th.Welcomekit_BE.service.UserService;
@@ -24,17 +25,23 @@ public class AttendanceSessionManager {
 	private final UserService userService;
 
 	public void generateQR(HttpServletResponse response) {
-		AttendanceSession session = attendanceSessionService.getTodaySession();
+		List<User> totalBabyLion = userService.getTotalBabyLionUser();
+		AttendanceSession session = attendanceSessionService.getTodaySession(totalBabyLion);
 		attendanceSessionService.generateQR(response, session.getId());
 	}
 
-	public String markAttendance(String studentNum, Long sessionId) {
+	public String markAttendance(String studentNum) {
 		User user = userService.getUserByStudentName(studentNum);
-		return attendanceSessionService.markAttendance(user, sessionId);
+		return attendanceSessionService.markAttendance(user);
 	}
 
 	public List<MyAttendanceResponse> getMyAttendance(String studentNum) {
 		User user = userService.getUserByStudentName(studentNum);
 		return attendanceSessionService.getMyAttendance(user);
+	}
+
+	public List<GetTodayAttendanceResponse> getTodayAttendance(String studentNum) {
+		User user = userService.getUserByStudentName(studentNum);
+		return attendanceSessionService.getTodayAttendance(user);
 	}
 }

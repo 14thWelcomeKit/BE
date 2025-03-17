@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -18,6 +19,7 @@ import com.google.zxing.common.BitMatrix;
 import com.likelion13th.Welcomekit_BE.domain.Attendance;
 import com.likelion13th.Welcomekit_BE.domain.AttendanceSession;
 import com.likelion13th.Welcomekit_BE.domain.User;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.GetTodayAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.MyAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.domain.enums.AttendanceStatus;
 import com.likelion13th.Welcomekit_BE.repository.AttendanceRepository;
@@ -42,10 +44,31 @@ public class AttendanceSessionService {
 		return attendanceSessionRepository.save(session);
 	}
 
+	public AttendanceSession createNewSession(List<User> totalBabyLion) {
+		AttendanceSession session = AttendanceSession.builder()
+			.sessionDate(LocalDateTime.now()) // 현재 날짜로 출석 세션 생성
+			.build();
+		AttendanceSession save = attendanceSessionRepository.save(session);
+		totalBabyLion.forEach(babyLion -> {
+			Attendance attendance = new Attendance();
+			attendance.setAttendanceSession(save);
+			attendance.setUser(babyLion);
+			attendance.setStatus(AttendanceStatus.ABSENT);
+			attendanceRepository.save(attendance);
+		});
+		return save;
+	}
+
 	// 오늘 생성된 출석 세션이 있는지 확인
 	public AttendanceSession getTodaySession() {
 		return attendanceSessionRepository.findTopBySessionDateAfter(LocalDateTime.now().toLocalDate().atStartOfDay())
 			.orElseGet(this::createNewSession); // 없으면 새로 생성
+	}
+
+	// 오늘 생성된 출석 세션이 있는지 확인
+	public AttendanceSession getTodaySession(List<User> totalBabyLion) {
+		return attendanceSessionRepository.findTopBySessionDateAfter(LocalDateTime.now().toLocalDate().atStartOfDay())
+			.orElseGet(() -> createNewSession(totalBabyLion)); // 없으면 새로 생성
 	}
 
 	public void generateQR(HttpServletResponse response, Long id) {
@@ -70,7 +93,7 @@ public class AttendanceSessionService {
 		}
 	}
 
-	public String markAttendance(User user, Long sessionId) {
+	public String markAttendance(User user) {
 		AttendanceSession session = getTodaySession();
 
 		Optional<Attendance> existingAttendance = attendanceRepository.findByUserAndAttendanceSession(user, session);
@@ -83,13 +106,10 @@ public class AttendanceSessionService {
 			? AttendanceStatus.PRESENT
 			: AttendanceStatus.LATE;
 
-		// 출석 기록 저장
-		Attendance attendance = Attendance.builder()
-			.user(user)
-			.attendanceSession(session)
-			.attendanceTime(LocalDateTime.now())
-			.status(status)
-			.build();
+		Attendance attendance = attendanceRepository.findByUserAndAttendanceSession(user, session)
+			.orElseThrow(() -> new NotFoundException("존재하지 않는 세션이나 유저입니다."));
+		attendance.setAttendanceTime(LocalDateTime.now());
+		attendance.setStatus(status);
 
 		attendanceRepository.save(attendance);
 		return user.getUserName() + "님, " + (status == AttendanceStatus.PRESENT ? "출석 완료" : "지각 처리되었습니다.");
@@ -105,5 +125,20 @@ public class AttendanceSessionService {
 		}).toList();
 		System.out.println("list = " + list);
 		return list;
+	}
+
+	public List<GetTodayAttendanceResponse> getTodayAttendance(User user) {
+		return attendanceSessionRepository.findTopBySessionDateAfter(
+				LocalDateTime.now().toLocalDate().atStartOfDay())
+			.orElseThrow(() -> new NotFoundException("아직 오늘 출석 QR를 생성하지 않았습니다."))
+			.getAttendanceList()
+			.stream()
+			.map(attendance -> {
+				GetTodayAttendanceResponse getTodayAttendanceResponse = new GetTodayAttendanceResponse();
+				getTodayAttendanceResponse.setAttendanceStatus(attendance.getStatus());
+				getTodayAttendanceResponse.setName(attendance.getUser().getUserName());
+				getTodayAttendanceResponse.setTeamName(attendance.getUser().getTeam().getTeamName());
+				return getTodayAttendanceResponse;
+			}).toList();
 	}
 }
