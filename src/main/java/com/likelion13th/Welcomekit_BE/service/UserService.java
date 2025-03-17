@@ -34,6 +34,8 @@ public class UserService {
 		user.setUserType(createUserRequest.getUserType());
 		user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
 		user.setStudentNum(createUserRequest.getStudentNum());
+		user.setDevPart(createUserRequest.getDevPart());
+		user.setProfileImage("");
 		userRepository.save(user);
 	}
 

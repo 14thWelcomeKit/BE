@@ -4,9 +4,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
+import com.likelion13th.Welcomekit_BE.domain.BingoCell;
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyBingoResponse;
+import com.likelion13th.Welcomekit_BE.domain.enums.BingoEnum;
 import com.likelion13th.Welcomekit_BE.repository.BingoCellRepository;
 import com.likelion13th.Welcomekit_BE.repository.BingoRepository;
 
@@ -31,5 +34,26 @@ public class BingoService {
 		}).toList();
 	}
 
-	
+	public BingoEnum revealBingoCell(User user, Long id) {
+		List<BingoCell> existsRevealedCells = user.getTeam()
+			.getBingo()
+			.getCells()
+			.stream()
+			.filter(BingoCell::isRevealed).toList();
+		if (existsRevealedCells.isEmpty()) {
+			BingoCell bingoCell = bingoCellRepository.findById(id)
+				.orElseThrow(() -> new NotFoundException("해당 셀을 찾을수 없습니다."));
+			bingoCell.setRevealed(true);
+			return bingoCellRepository.save(bingoCell).getMission();
+		} else {
+			if (existsRevealedCells.stream().filter(BingoCell::isComplete).count() == existsRevealedCells.size()) {
+				BingoCell bingoCell = bingoCellRepository.findById(id)
+					.orElseThrow(() -> new NotFoundException("해당 셀을 찾을수 없습니다."));
+				bingoCell.setRevealed(true);
+				return bingoCellRepository.save(bingoCell).getMission();
+			} else {
+				throw new RuntimeException("이미 다른 열린 셀이 존재합니다.");
+			}
+		}
+	}
 }

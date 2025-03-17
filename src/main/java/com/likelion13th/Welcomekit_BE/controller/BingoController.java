@@ -30,7 +30,8 @@ public class BingoController {
 	}
 
 	@PutMapping("/reveal/{bingo_cell_id}")
-	ResponseEntity<?> revealBingoCell(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long bingo_cell_id) {
-		return null;
+	ResponseEntity<?> revealBingoCell(@AuthenticationPrincipal UserDetails userDetails,
+		@PathVariable Long bingo_cell_id) {
+		return ResponseEntity.ok(bingoManager.revealBingoCell(userDetails.getUsername(), bingo_cell_id));
 	}
 }

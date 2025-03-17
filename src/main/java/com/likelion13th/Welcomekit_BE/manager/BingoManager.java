@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.likelion13th.Welcomekit_BE.domain.BingoCell;
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyBingoResponse;
+import com.likelion13th.Welcomekit_BE.domain.enums.BingoEnum;
 import com.likelion13th.Welcomekit_BE.service.BingoService;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
@@ -24,5 +25,10 @@ public class BingoManager {
 	public List<GetMyBingoResponse> getMyBingo(String studentNum) {
 		User user = userService.getUserByStudentNum(studentNum);
 		return bingoService.getMyBingo(user);
+	}
+
+	public BingoEnum revealBingoCell(String studentNum, Long id) {
+		User user = userService.getUserByStudentNum(studentNum);
+		return bingoService.revealBingoCell(user, id);
 	}
 }
