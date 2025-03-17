@@ -25,17 +25,17 @@ public class UserManager {
 	}
 
 	public List<GetAllBabyLionResponse> getTotalBabyLion(UserDetails userDetails) {
-		User user = userService.getUserByStudentName(userDetails.getUsername());
+		User user = userService.getUserByStudentNum(userDetails.getUsername());
 		return userService.getTotalBabyLion(user);
 	}
 
 	public List<GetAllBabyLionResponse> getTotalAdmin(UserDetails userDetails) {
-		User user = userService.getUserByStudentName(userDetails.getUsername());
+		User user = userService.getUserByStudentNum(userDetails.getUsername());
 		return userService.getTotalAdmin(user);
 	}
 
 	public GetMyInfoResponse getMyInfo(UserDetails userDetails) {
-		User user = userService.getUserByStudentName(userDetails.getUsername());
+		User user = userService.getUserByStudentNum(userDetails.getUsername());
 		return userService.getMyInfo(user);
 	}
 }

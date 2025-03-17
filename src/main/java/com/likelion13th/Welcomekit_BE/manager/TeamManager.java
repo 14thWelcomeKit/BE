@@ -29,14 +29,14 @@ public class TeamManager {
 	}
 
 	public void setExecutives(PutTeamExecutivesRequest putTeamExecutivesRequest) {
-		User executive = userService.getUserByStudentName(putTeamExecutivesRequest.getExecutiveStudentNum());
+		User executive = userService.getUserByStudentNum(putTeamExecutivesRequest.getExecutiveStudentNum());
 		executive.setTeam(teamService.getTeam(putTeamExecutivesRequest.getTeamName()));
 		userService.save(executive);
 		teamService.setExecutives(executive, putTeamExecutivesRequest.getTeamName());
 	}
 
 	public void setLeader(PutTeamLeaderRequest putTeamLeaderRequest) {
-		User leader = userService.getUserByStudentName(putTeamLeaderRequest.getStudentNum());
+		User leader = userService.getUserByStudentNum(putTeamLeaderRequest.getStudentNum());
 		leader.setTeam(teamService.getTeam(putTeamLeaderRequest.getTeamName()));
 		userService.save(leader);
 		teamService.setLeader(leader, putTeamLeaderRequest.getTeamName());
@@ -45,10 +45,10 @@ public class TeamManager {
 	public void setTeamMember(PutTeamMemberRequest putTeamMemberRequest) {
 		List<User> userList = new ArrayList<>();
 		putTeamMemberRequest.getExecutiveStudentNumList().forEach(studentNum -> {
-			User user = userService.getUserByStudentName(studentNum);
+			User user = userService.getUserByStudentNum(studentNum);
 			user.setTeam(teamService.getTeam(putTeamMemberRequest.getTeamName()));
 			userService.save(user);
-			userList.add(userService.getUserByStudentName(studentNum));
+			userList.add(userService.getUserByStudentNum(studentNum));
 		});
 		teamService.setTeamMember(userList, putTeamMemberRequest.getTeamName());
 	}

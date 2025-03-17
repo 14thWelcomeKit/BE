@@ -31,17 +31,17 @@ public class AttendanceSessionManager {
 	}
 
 	public String markAttendance(String studentNum) {
-		User user = userService.getUserByStudentName(studentNum);
+		User user = userService.getUserByStudentNum(studentNum);
 		return attendanceSessionService.markAttendance(user);
 	}
 
 	public List<MyAttendanceResponse> getMyAttendance(String studentNum) {
-		User user = userService.getUserByStudentName(studentNum);
+		User user = userService.getUserByStudentNum(studentNum);
 		return attendanceSessionService.getMyAttendance(user);
 	}
 
 	public List<GetTodayAttendanceResponse> getTodayAttendance(String studentNum) {
-		User user = userService.getUserByStudentName(studentNum);
+		User user = userService.getUserByStudentNum(studentNum);
 		return attendanceSessionService.getTodayAttendance(user);
 	}
 }
