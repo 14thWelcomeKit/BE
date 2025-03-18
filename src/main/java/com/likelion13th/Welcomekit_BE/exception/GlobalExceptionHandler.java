@@ -40,11 +40,11 @@ public class GlobalExceptionHandler {
 	}
 
 	// ✅ NullPointerException 처리
-	@ExceptionHandler(NullPointerException.class)
-	public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
-		ErrorResponse errorResponse = new ErrorResponse("UNAUTHORIZED_USER", "User authentication is required.");
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-	}
+	// @ExceptionHandler(NullPointerException.class)
+	// public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
+	// 	ErrorResponse errorResponse = new ErrorResponse("UNAUTHORIZED_USER", "User authentication is required.");
+	// 	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+	// }
 
 	// ✅ 기본적인 Exception 처리 (예상치 못한 오류)
 	@ExceptionHandler(Exception.class)
