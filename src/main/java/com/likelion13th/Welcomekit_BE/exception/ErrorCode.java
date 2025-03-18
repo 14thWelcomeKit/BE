@@ -15,7 +15,8 @@ public enum ErrorCode {
 	PERMISSION_ERROR(HttpStatus.BAD_REQUEST, "Permission error"),
 	SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "Session does not exist"),
 	TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "Team does not exist"),
-	CELL_NOT_FOUND(HttpStatus.NOT_FOUND, "Cell does not exist")
+	CELL_NOT_FOUND(HttpStatus.NOT_FOUND, "Cell does not exist"),
+	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "User authentication is required."); // ✅ 추가
 	;
 
 

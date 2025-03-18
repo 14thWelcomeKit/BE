@@ -1,5 +1,6 @@
 package com.likelion13th.Welcomekit_BE.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,17 +25,31 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(errorResponse);
 	}
 
+	// ✅ IllegalArgumentException 처리
+	@ExceptionHandler(RuntimeException.class)
+	public ResponseEntity<ErrorResponse> handleRunException(RuntimeException ex) {
+		ErrorResponse errorResponse = new ErrorResponse("RUNTIME", ex.getMessage());
+		return ResponseEntity.badRequest().body(errorResponse);
+	}
+
+	// ✅ DataIntegrityViolationException 처리 (DB 무결성 제약 위반)
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+		ErrorResponse errorResponse = new ErrorResponse("DUPLICATE_ENTRY", ex.getMessage());
+		return ResponseEntity.badRequest().body(errorResponse);
+	}
+
 	// ✅ NullPointerException 처리
 	@ExceptionHandler(NullPointerException.class)
 	public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException ex) {
-		ErrorResponse errorResponse = new ErrorResponse("NULL_POINTER", "Unexpected null value encountered");
+		ErrorResponse errorResponse = new ErrorResponse("UNAUTHORIZED_USER", "User authentication is required.");
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 	}
 
 	// ✅ 기본적인 Exception 처리 (예상치 못한 오류)
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-		ErrorResponse errorResponse = new ErrorResponse("INTERNAL_SERVER_ERROR", "An unexpected error occurred");
+		ErrorResponse errorResponse = new ErrorResponse("INTERNAL_SERVER_ERROR", ex.getMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
 	}
 }
