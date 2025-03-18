@@ -26,8 +26,8 @@ public class AttendanceSessionManager {
 
 	public void generateQR(HttpServletResponse response) {
 		List<User> totalBabyLion = userService.getTotalBabyLionUser();
-		AttendanceSession session = attendanceSessionService.getTodaySession(totalBabyLion);
-		attendanceSessionService.generateQR(response, session.getId());
+		attendanceSessionService.getTodaySession(totalBabyLion);
+		attendanceSessionService.generateQR(response);
 	}
 
 	public String markAttendance(String studentNum) {

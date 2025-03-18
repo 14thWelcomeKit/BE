@@ -67,13 +67,13 @@ public class AttendanceSessionService {
 	}
 
 	// 오늘 생성된 출석 세션이 있는지 확인
-	public AttendanceSession getTodaySession(List<User> totalBabyLion) {
-		return attendanceSessionRepository.findTopBySessionDateAfter(LocalDateTime.now().toLocalDate().atStartOfDay())
-			.orElseGet(() -> createNewSession(totalBabyLion)); // 없으면 새로 생성
+	public void getTodaySession(List<User> totalBabyLion) {
+		attendanceSessionRepository.findTopBySessionDateAfter(LocalDateTime.now().toLocalDate().atStartOfDay())
+			.orElseGet(() -> createNewSession(totalBabyLion));
 	}
 
-	public void generateQR(HttpServletResponse response, Long id) {
-		String qrUrl = "http://localhost:8080/api/attendance/success?sessionId=" + id;
+	public void generateQR(HttpServletResponse response) {
+		String qrUrl = "http://localhost:8080/api/attendance/success";
 
 		int width = 300;
 		int height = 300;
