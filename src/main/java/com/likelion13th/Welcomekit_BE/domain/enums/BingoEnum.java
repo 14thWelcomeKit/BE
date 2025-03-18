@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.Getter;
+
+@Getter
 public enum BingoEnum {
 	MISSION_1("첫 번째 미션"),
 	MISSION_2("두 번째 미션"),
@@ -36,10 +39,6 @@ public enum BingoEnum {
 
 	BingoEnum(String description) {
 		this.description = description;
-	}
-
-	public String getDescription() {
-		return description;
 	}
 
 	public static List<BingoEnum> getRandomMissions(int count) {

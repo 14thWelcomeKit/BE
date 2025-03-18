@@ -5,13 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetAllBabyLionResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyInfoResponse;
 import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
+import com.likelion13th.Welcomekit_BE.exception.CustomException;
+import com.likelion13th.Welcomekit_BE.exception.ErrorCode;
 import com.likelion13th.Welcomekit_BE.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -41,12 +42,12 @@ public class UserService {
 
 	public User getUserByStudentNum(String studentNum) {
 		return userRepository.findUserByStudentNum(studentNum)
-			.orElseThrow(() -> new NotFoundException("해당 학번으로 존재하는 사람이 없습니다."));
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 	}
 
 	public List<GetAllBabyLionResponse> getTotalBabyLion(User admin) {
 		if (admin.getUserType() != UserType.ADMIN) {
-			throw new RuntimeException("아기사자는 조회할수없습니다!");
+			throw new CustomException(ErrorCode.PERMISSION_ERROR);
 		}
 		log.info("아기사자 조회");
 		return userRepository.findAll().stream().filter(user -> user.getUserType() == UserType.BABY_LION).map(user -> {
@@ -65,7 +66,7 @@ public class UserService {
 
 	public List<GetAllBabyLionResponse> getTotalAdmin(User admin) {
 		if (admin.getUserType() != UserType.ADMIN) {
-			throw new RuntimeException("아기사자는 조회할수없습니다!");
+			throw new CustomException(ErrorCode.PERMISSION_ERROR);
 		}
 		log.debug("운영진 조회");
 		return userRepository.findAll().stream().filter(user -> user.getUserType() == UserType.ADMIN).map(user -> {

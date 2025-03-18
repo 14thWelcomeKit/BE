@@ -9,6 +9,8 @@ import org.webjars.NotFoundException;
 import com.likelion13th.Welcomekit_BE.domain.BingoCell;
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyBingoResponse;
+import com.likelion13th.Welcomekit_BE.exception.CustomException;
+import com.likelion13th.Welcomekit_BE.exception.ErrorCode;
 import com.likelion13th.Welcomekit_BE.repository.BingoCellRepository;
 import com.likelion13th.Welcomekit_BE.repository.BingoRepository;
 
@@ -41,13 +43,13 @@ public class BingoService {
 			.filter(BingoCell::isRevealed).toList();
 		if (existsRevealedCells.isEmpty()) {
 			BingoCell bingoCell = bingoCellRepository.findById(id)
-				.orElseThrow(() -> new NotFoundException("해당 셀을 찾을수 없습니다."));
+				.orElseThrow(() -> new CustomException(ErrorCode.NULL_POINTER));
 			bingoCell.setRevealed(true);
 			return bingoCellRepository.save(bingoCell).getMission().getDescription();
 		} else {
 			if (existsRevealedCells.stream().filter(BingoCell::isComplete).count() == existsRevealedCells.size()) {
 				BingoCell bingoCell = bingoCellRepository.findById(id)
-					.orElseThrow(() -> new NotFoundException("해당 셀을 찾을수 없습니다."));
+					.orElseThrow(() -> new CustomException(ErrorCode.CELL_NOT_FOUND));
 				bingoCell.setRevealed(true);
 				return bingoCellRepository.save(bingoCell).getMission().getDescription();
 			} else {

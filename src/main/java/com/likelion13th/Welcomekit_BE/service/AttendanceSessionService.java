@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -22,6 +21,8 @@ import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetTodayAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.MyAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.domain.enums.AttendanceStatus;
+import com.likelion13th.Welcomekit_BE.exception.CustomException;
+import com.likelion13th.Welcomekit_BE.exception.ErrorCode;
 import com.likelion13th.Welcomekit_BE.repository.AttendanceRepository;
 import com.likelion13th.Welcomekit_BE.repository.AttendanceSessionRepository;
 
@@ -107,7 +108,7 @@ public class AttendanceSessionService {
 			: AttendanceStatus.LATE;
 
 		Attendance attendance = attendanceRepository.findByUserAndAttendanceSession(user, session)
-			.orElseThrow(() -> new NotFoundException("존재하지 않는 세션이나 유저입니다."));
+			.orElseThrow(() -> new CustomException(ErrorCode.SESSION_NOT_FOUND));
 		attendance.setAttendanceTime(LocalDateTime.now());
 		attendance.setStatus(status);
 
@@ -123,14 +124,13 @@ public class AttendanceSessionService {
 			myAttendanceResponse.setDate(myAttendance.getAttendanceSession().getSessionDate().toLocalDate());
 			return myAttendanceResponse;
 		}).toList();
-		System.out.println("list = " + list);
 		return list;
 	}
 
 	public List<GetTodayAttendanceResponse> getTodayAttendance(User user) {
 		return attendanceSessionRepository.findTopBySessionDateAfter(
 				LocalDateTime.now().toLocalDate().atStartOfDay())
-			.orElseThrow(() -> new NotFoundException("아직 오늘 출석 QR를 생성하지 않았습니다."))
+			.orElseThrow(() -> new CustomException(ErrorCode.SESSION_NOT_FOUND))
 			.getAttendanceList()
 			.stream()
 			.map(attendance -> {

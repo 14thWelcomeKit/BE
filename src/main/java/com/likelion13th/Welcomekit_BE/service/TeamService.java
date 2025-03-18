@@ -14,6 +14,8 @@ import com.likelion13th.Welcomekit_BE.domain.Team;
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateTeamRequest;
 import com.likelion13th.Welcomekit_BE.domain.enums.BingoEnum;
+import com.likelion13th.Welcomekit_BE.exception.CustomException;
+import com.likelion13th.Welcomekit_BE.exception.ErrorCode;
 import com.likelion13th.Welcomekit_BE.repository.TeamRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -58,7 +60,7 @@ public class TeamService {
 
 	public void setExecutives(User executive, String teamName) {
 		Team team = teamRepository.findTeamByTeamName(teamName)
-			.orElseThrow(() -> new NotFoundException("해당 팀 명으로 존재하지 않습니다."));
+			.orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 		List<User> executives = team.getExecutives();
 		executives.add(executive);
 		team.setExecutives(executives);
@@ -68,7 +70,7 @@ public class TeamService {
 
 	public void setLeader(User leader, String teamName) {
 		Team team = teamRepository.findTeamByTeamName(teamName)
-			.orElseThrow(() -> new NotFoundException("해당 팀 명으로 존재하지 않습니다."));
+			.orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 		team.setLeader(leader);
 		leader.setTeam(team);
 		teamRepository.save(team);
@@ -76,7 +78,7 @@ public class TeamService {
 
 	public Team getTeam(String teamName) {
 		return teamRepository.findTeamByTeamName(teamName)
-			.orElseThrow(() -> new NotFoundException("해당 팀 명으로 존재하지 않습니다."));
+			.orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 	}
 
 	public void setTeamMember(List<User> userList, String teamName) {
