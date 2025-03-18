@@ -128,17 +128,12 @@ public class AttendanceSessionService {
 	}
 
 	public List<GetTodayAttendanceResponse> getTodayAttendance(User user) {
-		return attendanceSessionRepository.findTopBySessionDateAfter(
-				LocalDateTime.now().toLocalDate().atStartOfDay())
-			.orElseThrow(() -> new CustomException(ErrorCode.SESSION_NOT_FOUND))
-			.getAttendanceList()
-			.stream()
-			.map(attendance -> {
-				GetTodayAttendanceResponse getTodayAttendanceResponse = new GetTodayAttendanceResponse();
-				getTodayAttendanceResponse.setAttendanceStatus(attendance.getStatus());
-				getTodayAttendanceResponse.setName(attendance.getUser().getUserName());
-				getTodayAttendanceResponse.setTeamName(attendance.getUser().getTeam().getTeamName());
-				return getTodayAttendanceResponse;
-			}).toList();
+		List<GetTodayAttendanceResponse> attendanceResponses =
+			attendanceRepository.findTodayAttendance(LocalDateTime.now().toLocalDate().atStartOfDay());
+		System.out.println("attendanceResponses = " + attendanceResponses);
+		if (attendanceResponses.isEmpty()) {
+			throw new CustomException(ErrorCode.SESSION_NOT_FOUND);
+		}
+		return attendanceResponses;
 	}
 }

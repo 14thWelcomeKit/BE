@@ -45,4 +45,15 @@ public class Attendance {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
 	private AttendanceStatus status;
+
+	@Override
+	public String toString() {
+		return "Attendance{" +
+			"id=" + id +
+			", user=" + user +
+			", attendanceSession=" + attendanceSession +
+			", attendanceTime=" + attendanceTime +
+			", status=" + status +
+			'}';
+	}
 }

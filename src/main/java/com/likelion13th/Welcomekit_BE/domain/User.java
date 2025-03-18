@@ -53,4 +53,18 @@ public class User {
 	@ManyToOne
 	@JoinColumn(name = "team_id")
 	private Team team;
+
+	@Override
+	public String toString() {
+		return "User{" +
+			"id=" + id +
+			", userName='" + userName + '\'' +
+			", password='" + password + '\'' +
+			", studentNum='" + studentNum + '\'' +
+			", userType=" + userType +
+			", devPart=" + devPart +
+			", profileImage='" + profileImage + '\'' +
+			", team=" + team +
+			'}';
+	}
 }
