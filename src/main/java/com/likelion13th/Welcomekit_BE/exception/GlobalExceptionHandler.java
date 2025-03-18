@@ -25,12 +25,12 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.badRequest().body(errorResponse);
 	}
 
-	// ✅ IllegalArgumentException 처리
-	@ExceptionHandler(RuntimeException.class)
-	public ResponseEntity<ErrorResponse> handleRunException(RuntimeException ex) {
-		ErrorResponse errorResponse = new ErrorResponse("RUNTIME", ex.getMessage());
-		return ResponseEntity.badRequest().body(errorResponse);
-	}
+	// // ✅ IllegalArgumentException 처리
+	// @ExceptionHandler(RuntimeException.class)
+	// public ResponseEntity<ErrorResponse> handleRunException(RuntimeException ex) {
+	// 	ErrorResponse errorResponse = new ErrorResponse("RUNTIME", ex.getMessage());
+	// 	return ResponseEntity.badRequest().body(errorResponse);
+	// }
 
 	// ✅ DataIntegrityViolationException 처리 (DB 무결성 제약 위반)
 	@ExceptionHandler(DataIntegrityViolationException.class)
