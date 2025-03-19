@@ -99,7 +99,9 @@ public class AttendanceSessionService {
 
 		Optional<Attendance> existingAttendance = attendanceRepository.findByUserAndAttendanceSession(user, session);
 		if (existingAttendance.isPresent()) {
-			return "이미 출석한 기록이 있습니다.";
+			if (existingAttendance.get().getStatus() == AttendanceStatus.PRESENT) {
+				return "이미 출석한 기록이 있습니다.";
+			}
 		}
 
 		// 출석 상태 결정 (지각 여부 판단 가능)
