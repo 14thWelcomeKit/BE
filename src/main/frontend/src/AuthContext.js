@@ -7,30 +7,36 @@ const AuthContext = createContext();
 // AuthProvider 생성
 export function AuthProvider({ children }) {
   const cookies = new Cookies();
+  const [isLoggedIn, setIsLoggedIn] = useState(!!cookies.get("accessToken"));
   const [token, setToken] = useState(cookies.get("accessToken") || ""); // 쿠키에서 accessToken 가져옴
+
+  useEffect(() => {
+    setIsLoggedIn(!!token);
+  }, [token]);
 
   useEffect(() => {
     const storedToken = cookies.get("accessToken");
     if (storedToken) {
       setToken(storedToken);
+      setIsLoggedIn(true);
     }
   }, []);
 
   const saveToken = (newToken) => {
     setToken(newToken);
     cookies.set("accessToken", newToken, { path: "/", sameSite: "Lax" }); // ✅ sameSite 추가
+    setIsLoggedIn(true);
   };
 
-  // // 로그아웃 함수
-  // const logout = () => {
-  //     setToken("");
-  //     cookies.remove("accessToken"); // 쿠키 삭제
-  // };
-
-  // 로그아웃 기능 추가하면 넣기
+  const logout = () => {
+    setToken("");
+    cookies.remove("accessToken"); // 쿠키 삭제
+    setIsLoggedIn(false);
+    console.log("로그아웃 실행됨:", { token: "", isLoggedIn: false });
+  };
 
   return (
-    <AuthContext.Provider value={{ token, saveToken }}>
+    <AuthContext.Provider value={{ token, isLoggedIn, saveToken, logout }}>
       {children}
     </AuthContext.Provider>
   );

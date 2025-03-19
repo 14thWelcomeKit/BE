@@ -7,8 +7,8 @@ import Header from "../components/Header";
 import introduce1 from "../image/introduce1.png";
 import Logo from "../image/LIKELION UNIV._white@3x.png";
 import Together from "../image/IMG_9678 1.png";
-import Left from "../image/arrowLeft.svg";
-import Right from "../image/arrowRight.svg";
+import Left from "../image/Left.svg";
+import Right from "../image/Right.svg";
 import Image1 from "../image/image 12.png";
 import Image2 from "../image/image 13.png";
 import Image3 from "../image/image 14.png";
@@ -624,7 +624,7 @@ export default function Introduce() {
               <SubTitle>
                 2. 2024년보다 &nbsp;<span> 더욱 강화된 교육</span>을 제공합니다.
               </SubTitle>
-              <ResponsiveImage src={Logo} alt="mutsaLogo" maxWidth="441px" />
+              <ResponsiveImage src={Logo} alt="멋사 로고" maxWidth="441px" />
               <Text>
                 멋쟁이사자처럼 대학 교육 플랫폼 TECHIT 강좌를 무상 제공합니다.
                 <br />

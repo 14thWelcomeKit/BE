@@ -5,34 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import axiosInstance from "../axiosInstance";
-
-const breakpoints = {
-  mobile: "576px",
-  tablet: "768px",
-  laptop: "1024px",
-  desktop: "1200px",
-};
-const PageContainer = styled.div`
-  width: 100%;
-  height: 59.38rem;
-  padding: 2.25rem 3.44rem;
-  display: flex;
-  flex-direction: row;
-  background: var(--Bold-Black, #1c1b1a);
-  box-sizing: border-box;
-  gap: 10.69rem;
-  overflow: hidden;
-  @media (max-width: ${breakpoints.laptop}) {
-    gap: 5rem;
-  }
-
-  @media (max-width: ${breakpoints.tablet}) {
-    flex-direction: column;
-    gap: 3rem;
-    height: auto;
-    align-items: center;
-  }
-`;
+import PageContainer from "../components/PageContainer";
+import breakpoints from "../components/Breakpoints";
 
 const LoginContainer = styled.div`
   display: flex;
@@ -111,6 +85,7 @@ const LoginInput = styled.input`
   margin-bottom: 0.5rem;
   background-color: rgba(255, 255, 255, 0.19);
   border-color: rgba(255, 255, 255, 0.19);
+  color: #ffff;
 
   &:focus {
     border-color: #ffff;

@@ -2,7 +2,8 @@ import styled from "styled-components";
 import { ReactComponent as TitleLogo } from "../svg/TitleLogo.svg";
 import { ReactComponent as Menu } from "../svg/Menu.svg";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "../AuthContext";
 
 const breakpoints = {
   mobile: "576px",
@@ -119,9 +120,18 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isLoggedIn, logout } = useAuth();
 
   const handleNavigate = (path) => {
     navigate(path);
+    setIsModalOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    console.log("로그아웃 처리됨");
+    alert("로그아웃 성공!");
+    navigate("/main");
     setIsModalOpen(false);
   };
 
@@ -156,12 +166,16 @@ export default function Header() {
           </HeaderText>
         </MenuContainer>
         <LoginContainer>
-          <HeaderText
-            active={location.pathname === "/login"}
-            onClick={() => handleNavigate("/login")}
-          >
-            LOGIN
-          </HeaderText>
+          {isLoggedIn ? (
+            <HeaderText onClick={handleLogout}>LOGOUT</HeaderText>
+          ) : (
+            <HeaderText
+              active={location.pathname === "/login"}
+              onClick={() => handleNavigate("/login")}
+            >
+              LOGIN
+            </HeaderText>
+          )}
           <HeaderText
             active={location.pathname === "/mypage"}
             onClick={() => handleNavigate("/mypage")}
@@ -176,9 +190,13 @@ export default function Header() {
         <ModalOverlay onClick={() => setIsModalOpen(false)}>
           <MenuModal onClick={(e) => e.stopPropagation()}>
             <CloseButton onClick={() => setIsModalOpen(false)}>×</CloseButton>
-            <HeaderText onClick={() => handleNavigate("/login")}>
-              LOGIN
-            </HeaderText>
+            {isLoggedIn ? (
+              <HeaderText onClick={handleLogout}>LOGOUT</HeaderText>
+            ) : (
+              <HeaderText onClick={() => handleNavigate("/login")}>
+                LOGIN
+              </HeaderText>
+            )}
             <HeaderText onClick={() => handleNavigate("/introduce")}>
               INTRODUCE
             </HeaderText>

@@ -1,52 +1,17 @@
 import { useState, useEffect } from "react";
-import media from "styled-media-query";
 import Header from "../components/Header";
 import styled from "styled-components";
 import axiosInstance from "../axiosInstance";
-import Image from "../image/멋사 로고.png";
-
-const breakpoints = {
-  mobile: "576px",
-  tablet: "768px",
-  laptop: "1024px",
-  desktop: "1200px",
-};
-
-const PageContainer = styled.div`
-  width: 100%;
-  min-height: 100vh;
-  padding: 2.25rem 3.44rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  background: var(--Bold-Black, #1c1b1a);
-  box-sizing: border-box;
-  gap: 10.69rem;
-  overflow: hidden;
-
-  @media (max-width: ${breakpoints.laptop}) {
-    gap: 5rem;
-  }
-
-  @media (max-width: ${breakpoints.tablet}) {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-    height: auto;
-    align-items: center;
-    padding: 2rem;
-  }
-
-  @media (max-width: ${breakpoints.mobile}) {
-    padding: 1.5rem;
-  }
-`;
+import Image from "../image/Logo.png";
+import PageContainer from "../components/PageContainer";
+import breakpoints from "../components/Breakpoints";
 
 const MypageContainer = styled.div`
   display: flex;
-  width: 85.5rem;
-  height: 47.56rem;
+  width: 100%;
+  max-width: 85.5rem;
+  height: auto;
+  min-height: 47.56rem;
   padding: 3.75rem 2.25rem;
   flex-direction: column;
   border-radius: 1.25rem;
@@ -55,7 +20,7 @@ const MypageContainer = styled.div`
   backdrop-filter: blur(10px);
 
   @media (max-width: ${breakpoints.laptop}) {
-    width: 70rem;
+    max-width: 100%;
     padding: 2.5rem 1.5rem;
   }
 
@@ -72,16 +37,13 @@ const MypageContainer = styled.div`
 
 const MypageHeader = styled.div`
   display: flex;
-  width: 81rem;
-  height: 5.56rem;
+  width: 100%;
+  height: auto;
+  min-height: 5.56rem;
   flex-direction: row;
   margin-bottom: 2rem;
   align-items: center;
   justify-content: space-between;
-
-  @media (max-width: ${breakpoints.laptop}) {
-    width: 100%;
-  }
 
   @media (max-width: ${breakpoints.tablet}) {
     height: auto;
@@ -97,13 +59,13 @@ const MypageHeader = styled.div`
 
 const MypageBody = styled.div`
   display: flex;
-  width: 81rem;
-  height: 32.44rem;
+  width: 100%;
+  height: auto;
+  min-height: 32.44rem;
   flex-direction: row;
   gap: 2rem;
 
   @media (max-width: ${breakpoints.laptop}) {
-    width: 100%;
     height: auto;
   }
 
@@ -117,12 +79,12 @@ const MypageBody = styled.div`
 const TextBody = styled.div`
   display: flex;
   flex-direction: column;
-  width: 39.75rem;
-  height: 29.25rem;
-  margin-left: 8.81rem;
+  width: 50%;
+  height: auto;
+  min-height: 29.25rem;
+  margin-left: 2rem;
 
   @media (max-width: ${breakpoints.laptop}) {
-    width: 50%;
     margin-left: 2rem;
   }
 
@@ -133,23 +95,23 @@ const TextBody = styled.div`
 `;
 
 const ImgBody = styled.img`
-  width: 32.4375rem;
-  height: 32.4375rem;
-  background-color: yellow;
+  width: 45%;
+  max-width: 32.4375rem;
+  height: auto;
+  object-fit: contain;
+  aspect-ratio: 1/1;
 
   @media (max-width: ${breakpoints.laptop}) {
-    width: 25rem;
-    height: 25rem;
+    max-width: 25rem;
   }
 
   @media (max-width: ${breakpoints.tablet}) {
-    width: 20rem;
-    height: 20rem;
+    width: 100%;
+    max-width: 20rem;
   }
 
   @media (max-width: ${breakpoints.mobile}) {
-    width: 17.87rem;
-    height: 17.87rem;
+    max-width: 17.87rem;
   }
 `;
 
@@ -157,10 +119,6 @@ const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
   gap: 1rem;
-
-  @media (max-width: ${breakpoints.laptop}) {
-    flex-shrink: 0;
-  }
 
   @media (max-width: ${breakpoints.mobile}) {
     width: 100%;
@@ -170,7 +128,8 @@ const ButtonContainer = styled.div`
 `;
 
 const HeaderText = styled.h1`
-  width: 51.63rem;
+  width: auto;
+  max-width: 51.63rem;
   margin: 0;
   color: #ffff;
   font-family: Montserrat;
@@ -181,7 +140,6 @@ const HeaderText = styled.h1`
   letter-spacing: -0.1rem;
 
   @media (max-width: ${breakpoints.laptop}) {
-    width: 30rem;
     font-size: 3rem;
   }
 
@@ -273,8 +231,6 @@ const MypageBox = styled.div`
 `;
 
 export default function MyPage() {
-
-
   const [userdata, setUserdata] = useState({});
 
   useEffect(() => {

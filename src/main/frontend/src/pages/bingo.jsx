@@ -4,35 +4,8 @@ import Header from "../components/Header";
 import bingoImage from "../svg/bingo.svg";
 import { BsExclamationTriangle } from "react-icons/bs";
 import axiosInstance from "../axiosInstance";
-import media from "styled-media-query";
-
-const breakpoints = {
-  mobile: "576px",
-  tablet: "768px",
-  laptop: "1024px",
-  desktop: "1200px",
-};
-
-const PageContainer = styled.div`
-  width: 100%;
-  min-height: 100vh;
-  padding: 2rem;
-  display: flex;
-  flex-direction: row;
-  background: var(--Bold-Black, #1c1b1a);
-  box-sizing: border-box;
-  gap: 3rem;
-  overflow: hidden;
-  justify-content: center;
-  align-items: center;
-
-  @media (max-width: ${breakpoints.desktop}) {
-    flex-direction: column;
-    align-items: center;
-    gap: 5rem;
-    text-align: center;
-  }
-`;
+import breakpoints from "../components/Breakpoints";
+import PageContainer from "../components/PageContainer";
 
 const BingoTextContainer = styled.div`
   max-width: 37.5rem;
