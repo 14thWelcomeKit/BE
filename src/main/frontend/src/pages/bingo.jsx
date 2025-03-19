@@ -243,13 +243,11 @@ export default function Bingo() {
       return;
     }
 
-    // 이미 선택된 셀이 있고, 현재 셀이 이미 공개되지 않았다면
     if (selectedCell !== null) {
       alert("이미 선택된 미션이 있습니다. 관리자 승인을 기다려주세요.");
       return;
     }
 
-    // 이미 공개된 카드는 클릭할 수 없음
     if (missions[index]?.isRevealed) {
       return;
     }
@@ -263,13 +261,23 @@ export default function Bingo() {
       console.log("빙고 승인 응답:", response.data);
 
       if (response.status === 200) {
+        setMissions((prevMissions) =>
+          prevMissions.map((mission, i) =>
+            i === index
+              ? { ...mission, isFlipping: true, content: response.data }
+              : mission
+          )
+        );
+
         setTimeout(() => {
-          const updatedMissions = missions.map((mission, i) =>
-            i === index ? { ...mission, isRevealed: true } : mission
+          setMissions((prevMissions) =>
+            prevMissions.map((mission, i) =>
+              i === index
+                ? { ...mission, isRevealed: true, isFlipping: false }
+                : mission
+            )
           );
-          setMissions(updatedMissions);
-          setSelectedCell(missions[index].id);
-        }, 500); // 애니메이션을 위한 딜레이
+        }, 1000);
       }
     } catch (error) {
       console.error("빙고 승인이 실패했습니다:", error);

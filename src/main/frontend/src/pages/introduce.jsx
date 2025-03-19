@@ -610,9 +610,9 @@ export default function Introduce() {
               1. 개발 트랙을 &nbsp;<span>3가지</span>로 나누어 진행합니다.
             </SubTitle>
             <Track>
-              <TrackName>Fe(프론트엔드)</TrackName>
-              <TrackName>Be(백엔드)</TrackName>
-              <TrackName>Fe or BE(공통)</TrackName>
+              <TrackName>FE(프론트엔드)</TrackName>
+              <TrackName>BE(백엔드)</TrackName>
+              <TrackName>FE or BE(공통)</TrackName>
             </Track>
             <SmallText>
               * 공통 트랙은 5주차 이후, FE와 BE 중 트랙 선택 필요

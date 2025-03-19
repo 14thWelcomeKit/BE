@@ -146,7 +146,9 @@ export default function CheckBoard({ memberdata }) {
           <RowBox>{member.teamName}</RowBox>
           <RowBox>{member.name}</RowBox>
           <RowBox>
-            {member.attendanceStatus === "PRESENT" ? "출석" : "결석"}
+            {member.attendanceStatus === "PRESENT" ? "출석" :
+             member.attendanceStatus === "LATE" ? "지각" : 
+             member.attendanceStatus === "ABSENT" ? "결석" : "상태 불명"}
           </RowBox>
           <FixBox>
             <FixButton

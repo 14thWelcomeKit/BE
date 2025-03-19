@@ -291,6 +291,7 @@ export default function Login() {
           />
           <LoginText>PW</LoginText>
           <LoginInput
+            type="password"  // 비밀번호 입력 시 텍스트가 보이지 않게 설정
             placeholder="비밀번호를 입력해주세요."
             value={password}
             onChange={(e) => setPassword(e.target.value)}
