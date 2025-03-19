@@ -28,8 +28,8 @@ public class AttendanceSessionController {
 	private final AttendanceSessionManager attendanceSessionManager;
 
 	@GetMapping("generate-qr")
-	void generateQRCode(HttpServletResponse response) {
-		attendanceSessionManager.generateQR(response);
+	void generateQRCode(@AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response) {
+		attendanceSessionManager.generateQR(userDetails.getUsername(), response);
 	}
 
 	@PostMapping("/success")
