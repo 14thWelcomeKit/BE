@@ -73,7 +73,7 @@ public class AttendanceSessionService {
 	}
 
 	public void generateQR(HttpServletResponse response) {
-		String qrUrl = "http://localhost:8080/api/attendance/success";
+		String qrUrl = "https://welcomekitbe.lion.it.kr/api/attendance/success";
 
 		int width = 300;
 		int height = 300;
