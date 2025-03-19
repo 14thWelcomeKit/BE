@@ -295,7 +295,7 @@ export default function Check() {
           <ButtonContainer>
             <QrButton onClick={openQrModal}>QR 체크 진행</QrButton>
             <CheckButton onClick={openScanModal}>출석하기</CheckButton>
-            <QrButton>출석부 최신화</QrButton>
+            <QrButton onClick={fetchBoarddata}>출석부 최신화</QrButton>
           </ButtonContainer>
           {message && <MessageBox type={messageType}>{message}</MessageBox>}
         </TextContainer>

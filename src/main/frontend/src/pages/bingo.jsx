@@ -81,12 +81,12 @@ const BingoCard = styled.div`
   background-color: #f0f0f0;
   transform-style: preserve-3d;
   perspective: 1000px;
-  transition: transform 1s ease-in-out;
+  transition: transform 5s ease-in-out;
 
   ${({ flipped }) =>
     flipped &&
     `
-        transform: rotateY(1800deg);
+        transform: rotateY(1260deg);
     `}
 
   @media (max-width: ${breakpoints.laptop}) {
@@ -179,7 +179,6 @@ const BingoText = () => (
 );
 
 export default function Bingo() {
-  const [flippedCards, setFlippedCards] = useState(Array(9).fill(false));
   const [isProcessing, setIsProcessing] = useState(false);
   const [missions, setMissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -264,13 +263,13 @@ export default function Bingo() {
       console.log("빙고 승인 응답:", response.data);
 
       if (response.status === 200) {
-        // 선택한 카드만 isRevealed = true로 설정하고 나머지는 현재 상태 유지
-        const updatedMissions = missions.map((mission, i) =>
-          i === index ? { ...mission, isRevealed: true } : mission
-        );
-
-        setMissions(updatedMissions);
-        setSelectedCell(missions[index].id);
+        setTimeout(() => {
+          const updatedMissions = missions.map((mission, i) =>
+            i === index ? { ...mission, isRevealed: true } : mission
+          );
+          setMissions(updatedMissions);
+          setSelectedCell(missions[index].id);
+        }, 500); // 애니메이션을 위한 딜레이
       }
     } catch (error) {
       console.error("빙고 승인이 실패했습니다:", error);
@@ -283,7 +282,7 @@ export default function Bingo() {
   const images = missions.map((mission, index) => ({
     id: index + 1,
     src: bingoImage,
-    content: mission.content || `미션 ${index + 1}`,
+    content: mission.content || `${mission.mission}`,
   }));
 
   return (
