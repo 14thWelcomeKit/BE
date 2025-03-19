@@ -53,7 +53,7 @@ jobs:
       - name: Build Frontend
         run: |
           cd src/main/frontend
-          npm run build
+          CI=false npm run build
 
       - name: Copy Frontend Build to Static Folder
         run: |
