@@ -99,7 +99,7 @@ jobs:
 
       - name: docker run new container
         run: |
-          sudo docker run --name welcomekit_be --rm -d -p 8080:8080 -p 8081:80 \
+          sudo docker run --name welcomekit_be --rm -d -p 8080:8080 \
           ${{ secrets.DOCKERHUB_USERNAME }}/welcomekit_be
 
 #      - name: delete old docker image
