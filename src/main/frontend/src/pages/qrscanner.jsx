@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactQRScanner from "react-qr-scanner";
-import axios from "axios";
+import axiosInstance from "../axiosInstance";
 
 const QRScanner = () => {
   const [result, setResult] = useState(null);
@@ -24,12 +24,9 @@ const QRScanner = () => {
 
   const sendQRDataToServer = async (qrData) => {
     try {
-      const response = await axios.post(
-        "https://welcomekitbe.lion.it.kr/api/attendance/success",
-        {
-          qrData,
-        }
-      );
+      const response = await axiosInstance.post("/attendance/success", {
+        qrData,
+      });
 
       setMessage(`서버 응답: ${response.data.message}`);
     } catch (error) {
