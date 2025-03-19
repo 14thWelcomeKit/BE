@@ -86,7 +86,7 @@ const BingoCard = styled.div`
   ${({ flipped }) =>
     flipped &&
     `
-        transform: rotateY(540deg);
+        transform: rotateY(1800deg);
     `}
 
   @media (max-width: ${breakpoints.laptop}) {
