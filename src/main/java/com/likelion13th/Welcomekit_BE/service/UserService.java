@@ -92,4 +92,12 @@ public class UserService {
 		getMyInfoResponse.setTeamName(user.getTeam() != null ? user.getTeam().getTeamName() : null);
 		return getMyInfoResponse;
 	}
+
+	public void changePassword(User user, String currentPassword, String newPassword) {
+		if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+			throw new CustomException(ErrorCode.PASSWORD_NOT_MATCHES);
+		}
+		user.setPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
+	}
 }

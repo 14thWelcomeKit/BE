@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.likelion13th.Welcomekit_BE.domain.dto.request.ChangePasswordRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
 import com.likelion13th.Welcomekit_BE.manager.UserManager;
 
@@ -44,5 +45,14 @@ public class UserController {
 	@GetMapping("/info")
 	ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getMyInfo(userDetails));
+	}
+
+	@PostMapping("/password")
+	ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody
+	ChangePasswordRequest changePasswordRequest
+	) {
+		userManager.changePassword(userDetails, changePasswordRequest.getCurrentPassword(),
+			changePasswordRequest.getNewPassword());
+		return ResponseEntity.ok("password changed");
 	}
 }

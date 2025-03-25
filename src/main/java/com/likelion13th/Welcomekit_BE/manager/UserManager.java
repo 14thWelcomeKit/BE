@@ -38,4 +38,9 @@ public class UserManager {
 		User user = userService.getUserByStudentNum(userDetails.getUsername());
 		return userService.getMyInfo(user);
 	}
+
+	public void changePassword(UserDetails userDetails, String currentPassword, String newPassword) {
+		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		userService.changePassword(user, currentPassword, newPassword);
+	}
 }

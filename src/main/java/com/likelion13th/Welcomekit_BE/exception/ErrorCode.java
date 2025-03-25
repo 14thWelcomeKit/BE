@@ -1,9 +1,8 @@
 package com.likelion13th.Welcomekit_BE.exception;
 
-import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
@@ -16,9 +15,8 @@ public enum ErrorCode {
 	SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "Session does not exist"),
 	TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "Team does not exist"),
 	CELL_NOT_FOUND(HttpStatus.NOT_FOUND, "Cell does not exist"),
+	PASSWORD_NOT_MATCHES(HttpStatus.BAD_REQUEST, "Password is not correct"),
 	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "User authentication is required."); // ✅ 추가
-	;
-
 
 	private final HttpStatus httpStatus;
 	private final String message;
