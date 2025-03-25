@@ -23,6 +23,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 		"FROM attendance a " +
 		"JOIN a.user u " +
 		"JOIN u.team t " +
-		"WHERE a.attendanceSession.sessionDate > :date")
+		"WHERE a.attendanceSession.sessionDate > :date " +
+		"ORDER BY t.id")
 	List<GetTodayAttendanceResponse> findTodayAttendance(@Param("date") LocalDateTime date);
 }

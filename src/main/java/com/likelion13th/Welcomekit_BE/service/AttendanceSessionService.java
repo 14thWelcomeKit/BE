@@ -132,7 +132,6 @@ public class AttendanceSessionService {
 	public List<GetTodayAttendanceResponse> getTodayAttendance(User user) {
 		List<GetTodayAttendanceResponse> attendanceResponses =
 			attendanceRepository.findTodayAttendance(LocalDateTime.now().toLocalDate().atStartOfDay());
-		System.out.println("attendanceResponses = " + attendanceResponses);
 		if (attendanceResponses.isEmpty()) {
 			throw new CustomException(ErrorCode.SESSION_NOT_FOUND);
 		}
