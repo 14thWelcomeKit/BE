@@ -86,7 +86,7 @@ const BingoCard = styled.div`
   ${({ flipped }) =>
     flipped &&
     `
-        transform: rotateY(1260deg);
+        transform: rotateY(540deg);
     `}
 
   @media (max-width: ${breakpoints.laptop}) {
@@ -125,7 +125,7 @@ const CardContent = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  transform: rotateY(180deg);
+  transform: rotateY(540deg);
   backface-visibility: hidden;
   font-size: 1.25rem;
   font-weight: bold;
@@ -281,7 +281,7 @@ export default function Bingo() {
       }
     } catch (error) {
       console.error("빙고 승인이 실패했습니다:", error);
-      alert("승인 중 오류가 발생했습니다.");
+      alert("이미 선택된 미션이 있습니다. 관리자 승인을 기다려주세요.");
     } finally {
       setIsProcessing(false);
     }

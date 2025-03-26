@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import styled from "styled-components";
 import axiosInstance from "../axiosInstance";
@@ -231,6 +232,7 @@ const MypageBox = styled.div`
 `;
 
 export default function MyPage() {
+  const navigate = useNavigate();
   const [userdata, setUserdata] = useState({});
 
   useEffect(() => {
@@ -239,9 +241,7 @@ export default function MyPage() {
 
   const fetchMyData = async () => {
     try {
-      const response = await axiosInstance.get(
-        "https://welcomekitbe.lion.it.kr/api/user/info"
-      );
+      const response = await axiosInstance.get("/user/info");
       console.log(response.data);
       setUserdata(response.data);
     } catch (error) {
@@ -257,8 +257,9 @@ export default function MyPage() {
           <MypageHeader>
             <HeaderText>MY Page</HeaderText>
             <ButtonContainer>
-              <MypageButton>프로필 이미지 등록</MypageButton>
-              <MypageButton>비밀번호 변경</MypageButton>
+              <MypageButton onClick={() => navigate("/change-password")}>
+                비밀번호 변경
+              </MypageButton>
             </ButtonContainer>
           </MypageHeader>
           <MypageBody>
