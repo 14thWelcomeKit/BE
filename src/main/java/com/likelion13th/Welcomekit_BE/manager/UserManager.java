@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
@@ -42,5 +43,10 @@ public class UserManager {
 	public void changePassword(UserDetails userDetails, String currentPassword, String newPassword) {
 		User user = userService.getUserByStudentNum(userDetails.getUsername());
 		userService.changePassword(user, currentPassword, newPassword);
+	}
+
+	public void saveProfileImage(MultipartFile file, UserDetails userDetails) {
+		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		userService.saveProfileImage(file, user);
 	}
 }

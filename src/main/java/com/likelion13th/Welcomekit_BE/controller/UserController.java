@@ -9,12 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.likelion13th.Welcomekit_BE.domain.dto.request.ChangePasswordRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
 import com.likelion13th.Welcomekit_BE.manager.UserManager;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -54,5 +58,14 @@ public class UserController {
 		userManager.changePassword(userDetails, changePasswordRequest.getCurrentPassword(),
 			changePasswordRequest.getNewPassword());
 		return ResponseEntity.ok("password changed");
+	}
+
+	@Operation(summary = "프로필 이미지 업로드", description = "multipart로 프로필 이미지를 업로드합니다.")
+	@PostMapping(value = "/uploadProfile", consumes = "multipart/form-data")
+	ResponseEntity<?> uploadProfile(@AuthenticationPrincipal UserDetails userDetails,
+		@Parameter(name = "file", description = "업로드 사진 데이터")
+		@RequestParam(value = "file") MultipartFile file) {
+		userManager.saveProfileImage(file, userDetails);
+		return ResponseEntity.ok("저장 완료");
 	}
 }

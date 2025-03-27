@@ -16,6 +16,8 @@ public enum ErrorCode {
 	TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "Team does not exist"),
 	CELL_NOT_FOUND(HttpStatus.NOT_FOUND, "Cell does not exist"),
 	PASSWORD_NOT_MATCHES(HttpStatus.BAD_REQUEST, "Password is not correct"),
+	PROFILE_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "Profile update Error"),
+	INVALID_IMAGE_FORMAT(HttpStatus.BAD_REQUEST, "INVALID IMAGE FORMAT"),
 	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "User authentication is required."); // ✅ 추가
 
 	private final HttpStatus httpStatus;

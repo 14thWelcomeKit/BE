@@ -1,10 +1,25 @@
 package com.likelion13th.Welcomekit_BE.service;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
@@ -100,4 +115,68 @@ public class UserService {
 		user.setPassword(passwordEncoder.encode(newPassword));
 		userRepository.save(user);
 	}
+
+	public void saveProfileImage(MultipartFile file, User user) {
+		String studentNum = user.getStudentNum();
+		Path uploadDir = Paths.get("./profile/" + studentNum);
+
+		try {
+			if (!Files.exists(uploadDir)) {
+				Files.createDirectories(uploadDir);
+			}
+
+			// 확장자 고정 (예: JPG)
+			String fileName = "profile.jpg"; // 또는 "profile.webp"
+			Path filePath = uploadDir.resolve(fileName);
+
+			// 파일 이미 존재하면 삭제 (덮어쓰기 목적)
+			if (Files.exists(filePath)) {
+				Files.delete(filePath);
+			}
+
+			// BufferedImage로 읽기
+			BufferedImage originalImage = ImageIO.read(file.getInputStream());
+			if (originalImage == null) {
+				throw new CustomException(ErrorCode.INVALID_IMAGE_FORMAT);
+			}
+
+			// 이미지 리사이즈 (최대 300px)
+			int width = originalImage.getWidth();
+			int height = originalImage.getHeight();
+			int maxSize = 300;
+			float scale = Math.min((float) maxSize / width, (float) maxSize / height);
+			int newWidth = Math.round(width * scale);
+			int newHeight = Math.round(height * scale);
+
+			Image resized = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+			BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = resizedImage.createGraphics();
+			g.drawImage(resized, 0, 0, null);
+			g.dispose();
+
+			// 압축해서 저장 (JPEG 예시)
+			try (OutputStream os = Files.newOutputStream(filePath)) {
+				ImageWriter writer = ImageIO.getImageWritersByFormatName("jpeg").next();
+				ImageOutputStream ios = ImageIO.createImageOutputStream(os);
+				writer.setOutput(ios);
+
+				ImageWriteParam param = writer.getDefaultWriteParam();
+				param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+				param.setCompressionQuality(0.7f); // 70% 퀄리티로 압축
+
+				writer.write(null, new IIOImage(resizedImage, null, null), param);
+				writer.dispose();
+				ios.close();
+			}
+
+			// DB 경로 저장
+			user.setProfileImage("profile/" + studentNum + "/" + fileName);
+			userRepository.save(user);
+
+		} catch (IOException e) {
+			log.error("프로필 이미지 업로드 실패", e);
+			throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 }
