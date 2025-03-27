@@ -18,6 +18,7 @@ public enum ErrorCode {
 	PASSWORD_NOT_MATCHES(HttpStatus.BAD_REQUEST, "Password is not correct"),
 	PROFILE_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "Profile update Error"),
 	INVALID_IMAGE_FORMAT(HttpStatus.BAD_REQUEST, "INVALID IMAGE FORMAT"),
+	IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE NOT FOUND"),
 	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "User authentication is required."); // ✅ 추가
 
 	private final HttpStatus httpStatus;

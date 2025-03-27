@@ -3,6 +3,7 @@ package com.likelion13th.Welcomekit_BE.manager;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,4 +50,14 @@ public class UserManager {
 		User user = userService.getUserByStudentNum(userDetails.getUsername());
 		userService.saveProfileImage(file, user);
 	}
+
+	public Resource getProfileImage(UserDetails userDetails) {
+		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		return userService.getProfileImage(user);
+	}
+
+	public String getProfileSource(Resource resource) {
+		return userService.getProfileImageContentType(resource);
+	}
+
 }

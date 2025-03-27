@@ -17,6 +17,10 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -179,4 +183,28 @@ public class UserService {
 		}
 	}
 
+	public Resource getProfileImage(User user) {
+		String imagePath = user.getProfileImage(); // 예: "profile/201802265/profile.jpg"
+		Path path = Paths.get(imagePath);
+
+		try {
+			Resource resource = new UrlResource(path.toUri());
+			if (!resource.exists()) {
+				throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+			}
+
+			return resource;
+
+		} catch (IOException e) {
+			throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public String getProfileImageContentType(Resource resource) {
+		try {
+			return Files.probeContentType(resource.getFile().toPath());
+		} catch (IOException e) {
+			return MediaType.APPLICATION_OCTET_STREAM_VALUE;
+		}
+	}
 }

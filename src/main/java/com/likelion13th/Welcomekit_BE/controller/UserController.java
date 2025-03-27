@@ -1,6 +1,8 @@
 package com.likelion13th.Welcomekit_BE.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,5 +69,17 @@ public class UserController {
 		@RequestParam(value = "file") MultipartFile file) {
 		userManager.saveProfileImage(file, userDetails);
 		return ResponseEntity.ok("저장 완료");
+	}
+
+	@Operation(summary = "프로필 이미지 조회", description = "multipart로 프로필 이미지를 조회합니다.")
+	@GetMapping("/profileImage")
+	public ResponseEntity<Resource> getProfileImage(@AuthenticationPrincipal UserDetails userDetails) {
+
+		Resource image = userManager.getProfileImage(userDetails);
+		String contentType = userManager.getProfileSource(image);
+
+		return ResponseEntity.ok()
+			.contentType(MediaType.parseMediaType(contentType))
+			.body(image);
 	}
 }
