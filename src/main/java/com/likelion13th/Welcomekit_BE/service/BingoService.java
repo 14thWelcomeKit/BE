@@ -1,12 +1,14 @@
 package com.likelion13th.Welcomekit_BE.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
+import com.likelion13th.Welcomekit_BE.domain.Bingo;
 import com.likelion13th.Welcomekit_BE.domain.BingoCell;
+import com.likelion13th.Welcomekit_BE.domain.Team;
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyBingoResponse;
 import com.likelion13th.Welcomekit_BE.exception.CustomException;
@@ -15,9 +17,11 @@ import com.likelion13th.Welcomekit_BE.repository.BingoCellRepository;
 import com.likelion13th.Welcomekit_BE.repository.BingoRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BingoService {
 	@Autowired
 	private final BingoRepository bingoRepository;
@@ -55,6 +59,21 @@ public class BingoService {
 			} else {
 				throw new RuntimeException("이미 다른 열린 셀이 존재합니다.");
 			}
+		}
+	}
+
+	public void approveTeam(User user, Team team) {
+		if (!user.getUserName().equals("오현우")) {
+			log.error("누가 몰래 승인하려고 함");
+			throw new CustomException(ErrorCode.PERMISSION_ERROR);
+		}
+		Bingo bingo = bingoRepository.findByTeam(team)
+			.orElseThrow(() -> new CustomException(ErrorCode.INTERNAL_SERVER_ERROR));
+		Optional<BingoCell> bingoCell = bingoCellRepository.findByBingoAndCompleteAndRevealed(bingo,
+			false, true);
+		if (bingoCell.isPresent()) {
+			bingoCell.get().setComplete(true);
+			bingoCellRepository.save(bingoCell.get());
 		}
 	}
 }

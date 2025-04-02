@@ -3,12 +3,14 @@ package com.likelion13th.Welcomekit_BE.manager;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.likelion13th.Welcomekit_BE.domain.Team;
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyBingoResponse;
-import com.likelion13th.Welcomekit_BE.domain.enums.BingoEnum;
 import com.likelion13th.Welcomekit_BE.service.BingoService;
+import com.likelion13th.Welcomekit_BE.service.TeamService;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,8 @@ public class BingoManager {
 	private final BingoService bingoService;
 	@Autowired
 	private final UserService userService;
+	@Autowired
+	private final TeamService teamService;
 
 	public List<GetMyBingoResponse> getMyBingo(String studentNum) {
 		User user = userService.getUserByStudentNum(studentNum);
@@ -29,5 +33,11 @@ public class BingoManager {
 	public String revealBingoCell(String studentNum, Long id) {
 		User user = userService.getUserByStudentNum(studentNum);
 		return bingoService.revealBingoCell(user, id);
+	}
+
+	public void approveTeam(UserDetails userDetails, String teamName) {
+		Team team = teamService.getTeam(teamName);
+		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		bingoService.approveTeam(user, team);
 	}
 }

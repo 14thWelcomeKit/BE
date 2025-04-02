@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.imageio.IIOImage;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,6 +64,7 @@ public class UserService {
 
 	public List<GetAllBabyLionResponse> getTotalBabyLion(User admin) {
 		if (admin.getUserType() != UserType.ADMIN) {
+			log.error("관리자만 조회할수있습니다.");
 			throw new CustomException(ErrorCode.PERMISSION_ERROR);
 		}
 		log.info("아기사자 조회");
@@ -85,6 +84,7 @@ public class UserService {
 
 	public List<GetAllBabyLionResponse> getTotalAdmin(User admin) {
 		if (admin.getUserType() != UserType.ADMIN) {
+			log.error("관리자만 조회할수있습니다.");
 			throw new CustomException(ErrorCode.PERMISSION_ERROR);
 		}
 		log.debug("운영진 조회");
@@ -114,6 +114,7 @@ public class UserService {
 
 	public void changePassword(User user, String currentPassword, String newPassword) {
 		if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+			log.error("비밀번호가 틀렸습니다.");
 			throw new CustomException(ErrorCode.PASSWORD_NOT_MATCHES);
 		}
 		user.setPassword(passwordEncoder.encode(newPassword));
@@ -141,6 +142,7 @@ public class UserService {
 			// BufferedImage로 읽기
 			BufferedImage originalImage = ImageIO.read(file.getInputStream());
 			if (originalImage == null) {
+				log.error("Image가 null입니다.");
 				throw new CustomException(ErrorCode.INVALID_IMAGE_FORMAT);
 			}
 
@@ -148,7 +150,7 @@ public class UserService {
 			int width = originalImage.getWidth();
 			int height = originalImage.getHeight();
 			int maxSize = 300;
-			float scale = Math.min((float) maxSize / width, (float) maxSize / height);
+			float scale = Math.min((float)maxSize / width, (float)maxSize / height);
 			int newWidth = Math.round(width * scale);
 			int newHeight = Math.round(height * scale);
 
@@ -190,6 +192,7 @@ public class UserService {
 		try {
 			Resource resource = new UrlResource(path.toUri());
 			if (!resource.exists()) {
+				log.error("이미지를 찾을수없습니다.");
 				throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
 			}
 

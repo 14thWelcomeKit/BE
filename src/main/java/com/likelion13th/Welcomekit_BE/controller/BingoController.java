@@ -34,4 +34,10 @@ public class BingoController {
 		@PathVariable Long bingo_cell_id) {
 		return ResponseEntity.ok(bingoManager.revealBingoCell(userDetails.getUsername(), bingo_cell_id));
 	}
+
+	@PutMapping("approve/{team_name}")
+	ResponseEntity<?> approveTeam(@AuthenticationPrincipal UserDetails userDetails, @PathVariable String team_name) {
+		bingoManager.approveTeam(userDetails, team_name);
+		return ResponseEntity.ok("success");
+	}
 }

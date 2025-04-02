@@ -28,9 +28,11 @@ import com.likelion13th.Welcomekit_BE.repository.AttendanceSessionRepository;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AttendanceSessionService {
 	@Autowired
 	private final AttendanceSessionRepository attendanceSessionRepository;
@@ -133,6 +135,7 @@ public class AttendanceSessionService {
 		List<GetTodayAttendanceResponse> attendanceResponses =
 			attendanceRepository.findTodayAttendance(LocalDateTime.now().toLocalDate().atStartOfDay());
 		if (attendanceResponses.isEmpty()) {
+			log.error("세션이 없습니다.");
 			throw new CustomException(ErrorCode.SESSION_NOT_FOUND);
 		}
 		return attendanceResponses;

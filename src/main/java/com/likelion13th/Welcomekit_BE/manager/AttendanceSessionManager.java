@@ -16,9 +16,11 @@ import com.likelion13th.Welcomekit_BE.service.UserService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AttendanceSessionManager {
 
 	@Autowired
@@ -29,6 +31,7 @@ public class AttendanceSessionManager {
 	public void generateQR(String studentNum, HttpServletResponse response) {
 		User user = userService.getUserByStudentNum(studentNum);
 		if (user.getUserType() == UserType.BABY_LION) {
+			log.error("QR 생성할떄 permission error");
 			throw new CustomException(ErrorCode.PERMISSION_ERROR);
 		}
 		List<User> totalBabyLion = userService.getTotalBabyLionUser();
