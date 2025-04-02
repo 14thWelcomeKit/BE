@@ -38,8 +38,8 @@ public class BingoCell {
 	private BingoEnum mission;
 
 	@Column(name = "is_complete", nullable = false)
-	private boolean isComplete;
+	private Boolean isComplete;
 
 	@Column(name = "is_revealed", nullable = false)
-	private boolean isRevealed;
+	private Boolean isRevealed;
 }

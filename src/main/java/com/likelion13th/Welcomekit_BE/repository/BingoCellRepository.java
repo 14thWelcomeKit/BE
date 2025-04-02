@@ -8,5 +8,5 @@ import com.likelion13th.Welcomekit_BE.domain.Bingo;
 import com.likelion13th.Welcomekit_BE.domain.BingoCell;
 
 public interface BingoCellRepository extends JpaRepository<BingoCell, Long> {
-	Optional<BingoCell> findByBingoAndCompleteAndRevealed(Bingo bingo, boolean complete, boolean revealed);
+	Optional<BingoCell> findByBingoAndIsCompleteAndIsRevealed(Bingo bingo, boolean isComplete, boolean isRevealed);
 }

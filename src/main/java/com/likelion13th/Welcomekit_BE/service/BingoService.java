@@ -31,9 +31,9 @@ public class BingoService {
 	public List<GetMyBingoResponse> getMyBingo(User user) {
 		return user.getTeam().getBingo().getCells().stream().map(cell -> {
 			GetMyBingoResponse getMyBingoResponse = new GetMyBingoResponse();
-			getMyBingoResponse.setMission(cell.isRevealed() ? cell.getMission().getDescription() : null);
-			getMyBingoResponse.setIsComplete(cell.isComplete());
-			getMyBingoResponse.setIsRevealed(cell.isRevealed());
+			getMyBingoResponse.setMission(cell.getIsRevealed() ? cell.getMission().getDescription() : null);
+			getMyBingoResponse.setIsComplete(cell.getIsComplete());
+			getMyBingoResponse.setIsRevealed(cell.getIsRevealed());
 			getMyBingoResponse.setId(cell.getId());
 			return getMyBingoResponse;
 		}).toList();
@@ -44,17 +44,17 @@ public class BingoService {
 			.getBingo()
 			.getCells()
 			.stream()
-			.filter(BingoCell::isRevealed).toList();
+			.filter(BingoCell::getIsRevealed).toList();
 		if (existsRevealedCells.isEmpty()) {
 			BingoCell bingoCell = bingoCellRepository.findById(id)
 				.orElseThrow(() -> new CustomException(ErrorCode.NULL_POINTER));
-			bingoCell.setRevealed(true);
+			bingoCell.setIsRevealed(true);
 			return bingoCellRepository.save(bingoCell).getMission().getDescription();
 		} else {
-			if (existsRevealedCells.stream().filter(BingoCell::isComplete).count() == existsRevealedCells.size()) {
+			if (existsRevealedCells.stream().filter(BingoCell::getIsComplete).count() == existsRevealedCells.size()) {
 				BingoCell bingoCell = bingoCellRepository.findById(id)
 					.orElseThrow(() -> new CustomException(ErrorCode.CELL_NOT_FOUND));
-				bingoCell.setRevealed(true);
+				bingoCell.setIsRevealed(true);
 				return bingoCellRepository.save(bingoCell).getMission().getDescription();
 			} else {
 				throw new RuntimeException("이미 다른 열린 셀이 존재합니다.");
@@ -69,10 +69,10 @@ public class BingoService {
 		}
 		Bingo bingo = bingoRepository.findByTeam(team)
 			.orElseThrow(() -> new CustomException(ErrorCode.INTERNAL_SERVER_ERROR));
-		Optional<BingoCell> bingoCell = bingoCellRepository.findByBingoAndCompleteAndRevealed(bingo,
+		Optional<BingoCell> bingoCell = bingoCellRepository.findByBingoAndIsCompleteAndIsRevealed(bingo,
 			false, true);
 		if (bingoCell.isPresent()) {
-			bingoCell.get().setComplete(true);
+			bingoCell.get().setIsComplete(true);
 			bingoCellRepository.save(bingoCell.get());
 		}
 	}
