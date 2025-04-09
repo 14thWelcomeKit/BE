@@ -19,11 +19,11 @@ public class GlobalExceptionHandler {
 	}
 
 	// ✅ IllegalArgumentException 처리
-	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
-		ErrorResponse errorResponse = new ErrorResponse("INVALID_ARGUMENT", ex.getMessage());
-		return ResponseEntity.badRequest().body(errorResponse);
-	}
+	// @ExceptionHandler(IllegalArgumentException.class)
+	// public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
+	// 	ErrorResponse errorResponse = new ErrorResponse("INVALID_ARGUMENT", ex.getMessage());
+	// 	return ResponseEntity.badRequest().body(errorResponse);
+	// }
 
 	// // ✅ IllegalArgumentException 처리
 	// @ExceptionHandler(RuntimeException.class)
