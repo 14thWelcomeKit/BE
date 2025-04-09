@@ -123,7 +123,7 @@ public class UserService {
 
 	public void saveProfileImage(MultipartFile file, User user) {
 		String studentNum = user.getStudentNum();
-		Path uploadDir = Paths.get("./profile/" + studentNum);
+		Path uploadDir = Paths.get("/app/external-profile/" + studentNum);
 
 		try {
 			if (!Files.exists(uploadDir)) {
