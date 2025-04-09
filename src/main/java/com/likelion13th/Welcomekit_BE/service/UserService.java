@@ -188,7 +188,7 @@ public class UserService {
 	}
 
 	public Resource getProfileImage(User user) {
-		if (user.getProfileImage() == null) {
+		if (user.getProfileImage().isEmpty()) {
 			log.error("아직 프로필 이미지가 없습니다. 기본 이미지를 제공해드리겠습니다.");
 			throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
 		}

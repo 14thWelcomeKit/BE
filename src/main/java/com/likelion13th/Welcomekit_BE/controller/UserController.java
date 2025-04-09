@@ -74,7 +74,6 @@ public class UserController {
 	@Operation(summary = "프로필 이미지 조회", description = "multipart로 프로필 이미지를 조회합니다.")
 	@GetMapping("/profileImage")
 	public ResponseEntity<Resource> getProfileImage(@AuthenticationPrincipal UserDetails userDetails) {
-
 		Resource image = userManager.getProfileImage(userDetails);
 		String contentType = userManager.getProfileSource(image);
 
