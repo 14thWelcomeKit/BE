@@ -186,6 +186,10 @@ public class UserService {
 	}
 
 	public Resource getProfileImage(User user) {
+		if (user.getProfileImage() == null) {
+			log.error("아직 프로필 이미지가 없습니다. 기본 이미지를 제공해드리겠습니다.");
+			throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
+		}
 		String imagePath = user.getProfileImage(); // 예: "profile/201802265/profile.jpg"
 		Path path = Paths.get(imagePath);
 
@@ -195,7 +199,6 @@ public class UserService {
 				log.error("이미지를 찾을수없습니다.");
 				throw new CustomException(ErrorCode.IMAGE_NOT_FOUND);
 			}
-
 			return resource;
 
 		} catch (IOException e) {
