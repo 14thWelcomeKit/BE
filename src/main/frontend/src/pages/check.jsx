@@ -118,8 +118,8 @@ const CheckButton = styled.div`
 const Modal = styled.div`
   display: flex;
   flex-direction: column;
-  width: 35.9375rem;
-  height: 35.9375rem;
+  width: 45rem;
+  height: 45rem;
   padding: 1.125rem 1rem;
   justify-content: center;
   align-items: center;
@@ -317,7 +317,7 @@ export default function Check() {
                   <img
                     src={qrImage}
                     alt="QR Code"
-                    style={{ width: "90%", maxWidth: "30rem", height: "auto" }}
+                    style={{ width: "100%", maxWidth: "40rem", height: "auto" }}
                   />
                 ) : (
                   <p>Loading...</p>
