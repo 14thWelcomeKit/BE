@@ -176,7 +176,9 @@ public class UserService {
 			}
 
 			// DB 경로 저장
-			user.setProfileImage("profile/" + studentNum + "/" + fileName);
+			String filePath2 = "/app/external-profile/" + studentNum + "/" + fileName;
+			user.setProfileImage(filePath2);
+
 			userRepository.save(user);
 
 		} catch (IOException e) {
