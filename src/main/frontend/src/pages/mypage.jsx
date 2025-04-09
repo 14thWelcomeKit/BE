@@ -202,7 +202,7 @@ const MypageText = styled.h1`
   font-size: 1.125rem;
   font-style: normal;
   font-weight: 500;
-  line-height: 140%; /* 1.575rem */
+  line-height: 140%;
   letter-spacing: -0.02813rem;
   color: #ffff;
   margin: 0;
@@ -234,9 +234,11 @@ const MypageBox = styled.div`
 export default function MyPage() {
   const navigate = useNavigate();
   const [userdata, setUserdata] = useState({});
+  const [profileImage, setProfileImage] = useState(null);
 
   useEffect(() => {
     fetchMyData();
+    fetchMyProfile();
   }, []);
 
   const fetchMyData = async () => {
@@ -249,6 +251,18 @@ export default function MyPage() {
     }
   };
 
+  const fetchMyProfile = async () => {
+    try {
+      const response = await axiosInstance.get("/user/profileImage", {
+        responseType: "blob",
+      });
+      const imageUrl = URL.createObjectURL(response.data);
+      setProfileImage(imageUrl);
+    } catch (error) {
+      console.error("Error fetching profile image:", error);
+    }
+  };
+
   return (
     <>
       <Header></Header>
@@ -257,13 +271,16 @@ export default function MyPage() {
           <MypageHeader>
             <HeaderText>MY Page</HeaderText>
             <ButtonContainer>
+              <MypageButton onClick={() => navigate("/change-profile")}>
+                프로필 이미지 변경
+              </MypageButton>
               <MypageButton onClick={() => navigate("/change-password")}>
                 비밀번호 변경
               </MypageButton>
             </ButtonContainer>
           </MypageHeader>
           <MypageBody>
-            <ImgBody src={Image}></ImgBody>
+            <ImgBody src={profileImage || Image} alt="프로필 이미지" />
             <TextBody>
               <MypageText>이름</MypageText>
               <MypageBox>{userdata.name}</MypageBox>

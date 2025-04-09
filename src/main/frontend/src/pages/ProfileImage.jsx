@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import styled from "styled-components";
 import axiosInstance from "../axiosInstance";
 import PageContainer from "../components/PageContainer";
 import breakpoints from "../components/Breakpoints";
+import previewImage from "../image/Logo.png";
 
 const ProfileImageContainer = styled.div`
   display: flex;
@@ -159,6 +160,39 @@ export default function ProfileImage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    fetchMyProfile();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!selectedFile) {
+      setError("이미지를 선택해주세요.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    console.log("전송할 FormData:", formData.get("image")); // 디버깅용 로그
+
+    try {
+      const response = await axiosInstance.post(
+        "/user/uploadProfile",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("서버 응답:", response.data);
+      alert("프로필 이미지가 성공적으로 업로드되었습니다.");
+      navigate("/mypage");
+    } catch (error) {
+      setError("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
+      console.error("Error fetching profile image:", error);
+    }
+  };
+
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -180,29 +214,17 @@ export default function ProfileImage() {
     fileInputRef.current.click();
   };
 
-  const handleSubmit = async () => {
-    if (!selectedFile) {
-      setError("이미지를 선택해주세요.");
-      return;
+  const fetchMyProfile = async () => {
+    try {
+      const response = await axiosInstance.get("/user/profileImage", {
+        responseType: "blob",
+      });
+      const imageUrl = URL.createObjectURL(response.data);
+      setPreviewImage(imageUrl);
+    } catch (error) {
+      console.error("Error fetching profile image:", error);
     }
-
-    const formData = new FormData();
-    formData.append("image", selectedFile);
-
-    //   try {
-    //     await axiosInstance.post("/user/profile-image", formData, {
-    //       headers: {
-    //         "Content-Type": "multipart/form-data",
-    //       },
-    //     });
-    //     alert("프로필 이미지가 성공적으로 업로드되었습니다.");
-    //     navigate("/mypage");
-    //   } catch (error) {
-    //     setError("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
-    //   }
-    //
   };
-
   return (
     <>
       <Header />
@@ -214,7 +236,7 @@ export default function ProfileImage() {
               {previewImage ? (
                 <PreviewImage src={previewImage} alt="프로필 미리보기" />
               ) : (
-                <PreviewImage src="/default-profile.png" alt="기본 프로필" />
+                <PreviewImage src={previewImage} alt="기본 프로필" />
               )}
             </ImagePreview>
             <FileInput
