@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 import { BsInstagram } from "react-icons/bs";
 import { SiVelog } from "react-icons/si";
 import Header from "../components/Header";
@@ -31,17 +31,14 @@ const breakpoints = {
   desktop: "1200px",
 };
 
-const scroll = keyframes`
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); } 
-`;
-
 const Frame = styled.div`
   background: #1c1b1a;
   width: 100%;
-  max-width: 1440px;
   margin: 0 auto;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const Container = styled.div`

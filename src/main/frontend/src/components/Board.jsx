@@ -1,12 +1,13 @@
 import styled from "styled-components";
-import breakpoints from "../components/Breakpoints"; // ✅ breakpoints.js 가져오기
+import breakpoints from "../components/Breakpoints";
+import { useEffect, useState } from "react";
 
 const BoardContainer = styled.div`
   width: 42rem;
   height: 52rem;
   display: flex;
   flex-direction: column;
-  background-color: red;
+  background-color: white;
   overflow-y: auto;
   ::-webkit-scrollbar {
     width: 0px;
@@ -64,7 +65,9 @@ const RowBox = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
-  border: 1px solid #9d9d9d;
+  border-top: 1px solid #9d9d9d;
+  border-bottom: 1px solid #9d9d9d;
+  border-left: 1px solid #9d9d9d;
   font-family: Pretendard;
   font-size: 1rem;
   font-weight: 400;
@@ -132,6 +135,26 @@ const FixButton = styled.div`
 `;
 
 export default function CheckBoard({ memberdata }) {
+  const [boarddata, setBoarddata] = useState(memberdata);
+  useEffect(() => {
+    setBoarddata(memberdata);
+  }, [memberdata]);
+
+  const handleAttendanceChange = (member) => {
+    setBoarddata((prevData) =>
+      prevData.map((item) => {
+        if (item.teamName === member.teamName) {
+          return {
+            ...item,
+            attendanceStatus:
+              item.attendanceStatus === "ABSENT" ? "LATE" : "ABSENT",
+          };
+        }
+        return item;
+      })
+    );
+  };
+
   return (
     <BoardContainer>
       <BoardTitle>
@@ -140,25 +163,35 @@ export default function CheckBoard({ memberdata }) {
         <TitleBox>출석</TitleBox>
         <TitleBox>출석수정</TitleBox>
       </BoardTitle>
-
-      {memberdata.map((member, index) => (
-        <BoardRow key={index}>
-          <RowBox>{member.teamName}</RowBox>
-          <RowBox>{member.name}</RowBox>
-          <RowBox>
-            {member.attendanceStatus === "PRESENT" ? "출석" :
-             member.attendanceStatus === "LATE" ? "지각" : 
-             member.attendanceStatus === "ABSENT" ? "결석" : "상태 불명"}
-          </RowBox>
-          <FixBox>
-            <FixButton
-              onClick={() => alert(`${member.name}님의 출석을 변경합니다.`)}
-            >
-              출석수정
-            </FixButton>
-          </FixBox>
-        </BoardRow>
-      ))}
+      {boarddata
+        .filter(
+          (member) =>
+            member.attendanceStatus === "ABSENT" ||
+            member.attendanceStatus === "LATE"
+        )
+        .map((member, index) => (
+          <BoardRow key={index}>
+            <RowBox>{member.teamName}</RowBox>
+            <RowBox>{member.name}</RowBox>
+            <RowBox>
+              {member.attendanceStatus === "LATE"
+                ? "지각"
+                : member.attendanceStatus === "ABSENT"
+                ? "결석"
+                : "상태 불명"}
+            </RowBox>
+            <FixBox>
+              <FixButton
+                onClick={() => {
+                  alert(`${member.name}님의 출석을 변경합니다.`);
+                  handleAttendanceChange(member);
+                }}
+              >
+                출석수정
+              </FixButton>
+            </FixBox>
+          </BoardRow>
+        ))}
     </BoardContainer>
   );
 }

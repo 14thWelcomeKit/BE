@@ -118,8 +118,8 @@ const CheckButton = styled.div`
 const Modal = styled.div`
   display: flex;
   flex-direction: column;
-  width: 45rem;
-  height: 45rem;
+  width: 60rem;
+  height: auto;
   padding: 1.125rem 1rem;
   justify-content: center;
   align-items: center;
@@ -312,12 +312,11 @@ export default function Check() {
 
             {modalType === "qr" && (
               <>
-                <h3>QR 코드</h3>
                 {qrImage ? (
                   <img
                     src={qrImage}
                     alt="QR Code"
-                    style={{ width: "100%", maxWidth: "40rem", height: "auto" }}
+                    style={{ width: "95%", height: "auto" }}
                   />
                 ) : (
                   <p>Loading...</p>
@@ -327,7 +326,6 @@ export default function Check() {
 
             {modalType === "scan" && (
               <>
-                <h3>QR 코드 스캔</h3>
                 {!scanResult ? (
                   <ScannerContainer>
                     <ReactQRScanner
