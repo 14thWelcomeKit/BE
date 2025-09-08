@@ -32,35 +32,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # 3. 프론트엔드 빌드 (오류 방지 포함)
-      - name: Clean npm cache and reinstall dependencies
-        run: |
-          cd src/main/frontend
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
-          npm install
-
-      - name: Check installed dependencies
-        run: |
-          cd src/main/frontend
-          npm list react-scripts
-
-      - name: Install react-scripts if missing
-        run: |
-          cd src/main/frontend
-          npm install react-scripts --save
-
-      - name: Build Frontend
-        run: |
-          cd src/main/frontend
-          CI=false npm run build
-
-      - name: Copy Frontend Build to Static Folder
-        run: |
-          rm -rf src/main/resources/static
-          mkdir -p src/main/resources/static
-          cp -r src/main/frontend/build/* src/main/resources/static/
-
       # 4. Spring Boot 애플리케이션 빌드
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
