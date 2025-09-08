@@ -10,6 +10,7 @@ import org.webjars.NotFoundException;
 
 import com.likelion13th.Welcomekit_BE.domain.Manito;
 import com.likelion13th.Welcomekit_BE.domain.User;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.SelectManitoRequest;
 import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
 import com.likelion13th.Welcomekit_BE.repository.ManitoRepository;
 import com.likelion13th.Welcomekit_BE.repository.UserRepository;
@@ -71,5 +72,13 @@ public class ManitoService {
 				manitoRepository.deleteAll();
 			}
 		}
+	}
+
+	public void selectManito(String studentNum, SelectManitoRequest selectManitoRequest) {
+		User user = userRepository.findUserByStudentNum(studentNum).orElseThrow(() -> new NotFoundException("유저가 없어요"));
+
+		Manito manito = manitoRepository.findByManito(user);
+		manito.setSelectedName(selectManitoRequest.getName());
+		manitoRepository.save(manito);
 	}
 }

@@ -12,6 +12,7 @@ import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetAllBabyLionResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyInfoResponse;
+import com.likelion13th.Welcomekit_BE.repository.UserRepository;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,10 @@ public class UserManager {
 	public List<GetAllBabyLionResponse> getTotalBabyLion(UserDetails userDetails) {
 		User user = userService.getUserByStudentNum(userDetails.getUsername());
 		return userService.getTotalBabyLion(user);
+	}
+
+	public List<String> getTotalExceptMe(UserDetails userDetails) {
+		return userService.getAllNameExceptMe(userDetails.getUsername());
 	}
 
 	public List<GetAllBabyLionResponse> getTotalAdmin(UserDetails userDetails) {

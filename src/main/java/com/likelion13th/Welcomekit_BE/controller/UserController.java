@@ -43,6 +43,11 @@ public class UserController {
 		return ResponseEntity.ok(userManager.getTotalBabyLion(userDetails));
 	}
 
+	@GetMapping("/total/exceptMe")
+	ResponseEntity<?> getAllExceptMe(@AuthenticationPrincipal UserDetails userDetails) {
+		return ResponseEntity.ok(userManager.getTotalExceptMe(userDetails));
+	}
+
 	@GetMapping("/total/admin")
 	ResponseEntity<?> getAllAdmin(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getTotalAdmin(userDetails));

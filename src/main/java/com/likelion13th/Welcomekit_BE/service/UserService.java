@@ -78,6 +78,14 @@ public class UserService {
 		}).toList();
 	}
 
+	public List<String> getAllNameExceptMe(String studentNum) {
+		return userRepository.findAll()
+			.stream()
+			.filter(user -> !user.getStudentNum().equals(studentNum))
+			.map(User::getUserName)
+			.toList();
+	}
+
 	public List<User> getTotalBabyLionUser() {
 		return userRepository.findAll().stream().filter(user -> user.getUserType() == UserType.BABY_LION).toList();
 	}

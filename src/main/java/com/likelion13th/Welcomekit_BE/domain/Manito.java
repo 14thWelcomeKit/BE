@@ -24,6 +24,8 @@ public class Manito {
 	@ManyToOne
 	private User manito;
 
+	private String selectedName;
+
 	@Builder
 	public Manito(User user, User manito) {
 		this.user = user;
