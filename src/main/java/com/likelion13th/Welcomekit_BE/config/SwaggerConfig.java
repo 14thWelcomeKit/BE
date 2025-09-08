@@ -25,14 +25,10 @@ public class SwaggerConfig {
 				.name("HyunWoo9930")
 				.email("hw62459930@gmail.com"));
 
-		String localServer = "http://localhost:8080";
-		String productionServer = "https://welcomekitbe.lion.it.kr";
-
 		return new OpenAPI()
 			.info(info)
 			.servers(List.of(
-				new Server().url(localServer).description("Local Server"),
-				new Server().url(productionServer).description("Production Server")
+				new Server().url("/").description("현재 도메인")
 			))
 			.addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
 			.components(new io.swagger.v3.oas.models.Components()
