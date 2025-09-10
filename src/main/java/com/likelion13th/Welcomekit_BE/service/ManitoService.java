@@ -29,7 +29,9 @@ public class ManitoService {
 	@Transactional
 	public void createManitoAssignments() {
 		// 1. 모든 활성 사용자 조회
-		List<User> users = userRepository.findAll();
+		List<User> users = userRepository.findAll().stream().filter(
+			user -> !user.getUserName().equals("이은서")
+		).toList();
 
 		// 2. 기존 마니또 관계 삭제 (재설정 시)
 		manitoRepository.deleteAll();
