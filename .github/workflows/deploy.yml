@@ -63,10 +63,7 @@ jobs:
 
       - name: docker stop container
         run: |
-          if [ $(sudo docker ps -q -f name=welcomekit_be) ]; then
-            sudo docker stop welcomekit_be
-            sudo docker rm -f welcomekit_be
-          fi
+          sudo docker rm -f welcomekit_be || true
 
       - name: docker run new container
         run: |
