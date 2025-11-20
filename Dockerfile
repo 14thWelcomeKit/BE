@@ -1,5 +1,5 @@
 # Use an official Eclipse Temurin runtime as a parent image
-FROM --platform=linux/amd64 eclipse-temurin:17-jdk-slim
+FROM --platform=linux/amd64 eclipse-temurin:17-jre
 
 # Set the working directory
 WORKDIR /app
