@@ -54,6 +54,7 @@ public class UserService {
 		user.setStudentNum(createUserRequest.getStudentNum());
 		user.setDevPart(createUserRequest.getDevPart());
 		user.setProfileImage("");
+		user.setHasReadWelcome(false);
 		userRepository.save(user);
 	}
 
@@ -117,7 +118,13 @@ public class UserService {
 		getMyInfoResponse.setStudentName(user.getStudentNum());
 		getMyInfoResponse.setName(user.getUserName());
 		getMyInfoResponse.setTeamName(user.getTeam() != null ? user.getTeam().getTeamName() : null);
+		getMyInfoResponse.setHasReadWelcome(user.getHasReadWelcome());
 		return getMyInfoResponse;
+	}
+
+	public void updateHasReadWelcome(User user, boolean hasReadWelcome) {
+		user.setHasReadWelcome(hasReadWelcome);
+		userRepository.save(user);
 	}
 
 	public void changePassword(User user, String currentPassword, String newPassword) {
