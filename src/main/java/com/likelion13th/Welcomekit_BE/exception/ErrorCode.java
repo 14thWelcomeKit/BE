@@ -19,7 +19,8 @@ public enum ErrorCode {
 	PROFILE_UPDATE_ERROR(HttpStatus.BAD_REQUEST, "Profile update Error"),
 	INVALID_IMAGE_FORMAT(HttpStatus.BAD_REQUEST, "INVALID IMAGE FORMAT"),
 	IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE NOT FOUND"),
-	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "User authentication is required."); // ✅ 추가
+	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "User authentication is required."),
+	WELCOME_MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Welcome message does not exist");
 
 	private final HttpStatus httpStatus;
 	private final String message;

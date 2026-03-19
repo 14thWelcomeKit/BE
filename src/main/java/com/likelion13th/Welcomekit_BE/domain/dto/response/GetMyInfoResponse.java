@@ -13,4 +13,5 @@ public class GetMyInfoResponse {
 	private String teamName;
 	private DevPart devPart;
 	private String profileImage;
+	private Boolean hasReadWelcome;
 }

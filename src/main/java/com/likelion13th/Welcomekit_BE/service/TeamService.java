@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.webjars.NotFoundException;
 
 import com.likelion13th.Welcomekit_BE.domain.Bingo;
 import com.likelion13th.Welcomekit_BE.domain.BingoCell;

@@ -6,12 +6,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import com.likelion13th.Welcomekit_BE.domain.Manito;
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.SelectManitoRequest;
 import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
+import com.likelion13th.Welcomekit_BE.exception.CustomException;
+import com.likelion13th.Welcomekit_BE.exception.ErrorCode;
 import com.likelion13th.Welcomekit_BE.repository.ManitoRepository;
 import com.likelion13th.Welcomekit_BE.repository.UserRepository;
 
@@ -58,7 +59,8 @@ public class ManitoService {
 
 	public String getManito(String userName) {
 		log.info("마니또 조회 기능 실행중 학번 : {}", userName);
-		User user = userRepository.findUserByStudentNum(userName).orElseThrow(() -> new NotFoundException("유저가 없어요"));
+		User user = userRepository.findUserByStudentNum(userName)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 		Manito manito = manitoRepository.findByUser(user);
 		if (manito == null) {
 			return "아직 마니또 생성 전입니다!";
@@ -67,7 +69,8 @@ public class ManitoService {
 	}
 
 	public void deleteManito(String studentNum) {
-		User user = userRepository.findUserByStudentNum(studentNum).orElseThrow(() -> new NotFoundException("유저가 없어요"));
+		User user = userRepository.findUserByStudentNum(studentNum)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 		if (user.getUserType() == UserType.ADMIN) {
 			if (user.getUserName().equals("오현우") || user.getUserName().equals("신상현") || user.getUserName()
 				.equals("오혀누")) {
@@ -77,7 +80,8 @@ public class ManitoService {
 	}
 
 	public void selectManito(String studentNum, SelectManitoRequest selectManitoRequest) {
-		User user = userRepository.findUserByStudentNum(studentNum).orElseThrow(() -> new NotFoundException("유저가 없어요"));
+		User user = userRepository.findUserByStudentNum(studentNum)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		Manito manito = manitoRepository.findByManito(user);
 		manito.setSelectedName(selectManitoRequest.getName());

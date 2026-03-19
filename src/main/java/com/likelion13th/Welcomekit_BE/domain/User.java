@@ -50,6 +50,9 @@ public class User {
 	@Column(name = "profile_image")
 	private String profileImage;
 
+	@Column(name = "has_read_welcome", nullable = false)
+	private Boolean hasReadWelcome;
+
 	@ManyToOne
 	@JoinColumn(name = "team_id")
 	private Team team;
@@ -64,6 +67,7 @@ public class User {
 			", userType=" + userType +
 			", devPart=" + devPart +
 			", profileImage='" + profileImage + '\'' +
+			", hasReadWelcome=" + hasReadWelcome +
 			", team=" + team +
 			'}';
 	}
