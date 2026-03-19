@@ -20,7 +20,14 @@ public enum ErrorCode {
 	INVALID_IMAGE_FORMAT(HttpStatus.BAD_REQUEST, "INVALID IMAGE FORMAT"),
 	IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE NOT FOUND"),
 	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "User authentication is required."),
-	WELCOME_MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Welcome message does not exist");
+	WELCOME_MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Welcome message does not exist"),
+
+	// ── 14기 빙고 V1 전용 에러코드 ──
+	CELL_ALREADY_OCCUPIED(HttpStatus.CONFLICT, "해당 칸은 이미 점유 완료되었습니다."),
+	NOT_CELL_OWNER(HttpStatus.FORBIDDEN, "해당 칸의 소유 팀이 아니거나 진행 중인 상태가 아닙니다."),
+	USE_PATCH_FOR_UPDATE(HttpStatus.BAD_REQUEST, "본인 팀의 진행 중인 사진은 PATCH 엔드포인트로 수정해주세요."),
+	UPDATE_WINDOW_EXPIRED(HttpStatus.BAD_REQUEST, "12시간 독점 기간이 이미 만료되었습니다."),
+	TEAM_NOT_ASSIGNED(HttpStatus.BAD_REQUEST, "팀에 배정되지 않은 사용자입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;
