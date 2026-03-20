@@ -68,7 +68,7 @@ jobs:
 
       - name: docker run new container
         run: |
-          sudo docker run -v /home/ec2-user/profile:/app/external-profile --name welcomekit_be --rm -d -p 8080:8080 \
+          sudo docker run -v /home/ubuntu/profile:/app/external-profile --name welcomekit_be --rm -d --network host \
           ${{ secrets.DOCKERHUB_USERNAME }}/welcomekit_be
 
       - name: delete old docker image
