@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface QnaCommentRepository extends JpaRepository<QnaComment, Long> {
 
-    List<QnaComment> findByQnaIdAndDeletedAtIsNull(Long qnaId);
+    List<QnaComment> findByQnaIdAndDeletedAtIsNullOrderByCreatedAtAsc(Long qnaId);
 }

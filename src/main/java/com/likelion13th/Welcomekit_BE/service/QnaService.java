@@ -7,7 +7,6 @@ import com.likelion13th.Welcomekit_BE.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,13 +18,19 @@ public class QnaService {
 
     public Qna createQna(Long userId, String title, String content){
 
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("제목은 필수입니다");
+        }
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("내용은 필수입니다");
+        }
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         Qna qna = Qna.builder()
                 .title(title)
                 .content(content)
-                .createdAt(LocalDateTime.now())
                 .user(user)
                 .build();
 
@@ -38,19 +43,19 @@ public class QnaService {
 
     public Qna getQna(Long id){
         return qnaManager.findById(id)
-                .orElseThrow(() -> new RuntimeException("Qna not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Qna not found"));
     }
-
 
     public void deleteQna(Long qnaId, Long userId){
 
         Qna qna = qnaManager.findById(qnaId)
-                .orElseThrow(() -> new RuntimeException("Qna not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Qna not found"));
 
         if (!qna.getUser().getId().equals(userId)) {
-            throw new RuntimeException("삭제 권한 없음");
+            throw new IllegalArgumentException("삭제 권한 없음");
         }
 
         qnaManager.delete(qna);
+        qnaManager.save(qna);
     }
 }

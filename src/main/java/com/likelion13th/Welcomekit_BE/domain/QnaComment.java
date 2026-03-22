@@ -1,5 +1,6 @@
 package com.likelion13th.Welcomekit_BE.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,9 +29,16 @@ public class QnaComment {
 
     @ManyToOne
     @JoinColumn(name = "qna_id")
+    @JsonIgnore
     private Qna qna;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
