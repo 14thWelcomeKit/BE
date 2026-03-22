@@ -16,4 +16,8 @@ public class CustomUserDetailsService {
 	public User findByUserName(String userName) {
 		return userRepository.findByUserName(userName).orElse(null);
 	}
+
+	public User findByStudentNum(String studentNum) {
+		return userRepository.findUserByStudentNum(studentNum).orElse(null);
+	}
 }
