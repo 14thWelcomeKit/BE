@@ -41,7 +41,16 @@ public class QnaService {
                 .orElseThrow(() -> new RuntimeException("Qna not found"));
     }
 
-    public void deleteQna(Long id){
-        qnaManager.delete(id);
+
+    public void deleteQna(Long qnaId, Long userId){
+
+        Qna qna = qnaManager.findById(qnaId)
+                .orElseThrow(() -> new RuntimeException("Qna not found"));
+
+        if (!qna.getUser().getId().equals(userId)) {
+            throw new RuntimeException("삭제 권한 없음");
+        }
+
+        qnaManager.delete(qna);
     }
 }

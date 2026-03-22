@@ -2,6 +2,7 @@ package com.likelion13th.Welcomekit_BE.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,13 +11,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Qna {
+public class QnaComment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String title;
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -24,6 +23,12 @@ public class Qna {
     private LocalDateTime createdAt;
 
     private LocalDateTime deletedAt;
+
+    private Boolean isAdminComment;
+
+    @ManyToOne
+    @JoinColumn(name = "qna_id")
+    private Qna qna;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

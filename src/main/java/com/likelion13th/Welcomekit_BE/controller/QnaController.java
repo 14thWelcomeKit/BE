@@ -33,8 +33,12 @@ public class QnaController {
         return qnaService.getQna(id);
     }
 
+
     @DeleteMapping("/{id}")
-    public void deleteQna(@PathVariable Long id){
-        qnaService.deleteQna(id);
+    public void deleteQna(
+            @PathVariable Long id,
+            @RequestParam Long userId
+    ){
+        qnaService.deleteQna(id, userId);
     }
 }
