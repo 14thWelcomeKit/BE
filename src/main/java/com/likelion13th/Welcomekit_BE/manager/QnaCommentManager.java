@@ -18,11 +18,11 @@ public class QnaCommentManager {
     }
 
     public List<QnaComment> findByQnaId(Long qnaId){
-        return repository.findByQnaIdAndDeletedAtIsNull(qnaId);
+        return repository.findByQnaIdAndDeletedAtIsNullOrderByCreatedAtAsc(qnaId);
     }
 
     public QnaComment findById(Long id){
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
     }
 }

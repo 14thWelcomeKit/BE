@@ -20,16 +20,19 @@ public class QnaCommentService {
 
     public QnaComment createComment(Long userId, Long qnaId, String content){
 
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("댓글 내용은 필수입니다");
+        }
+
         Qna qna = qnaManager.findById(qnaId)
-                .orElseThrow(() -> new RuntimeException("Qna not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Qna not found"));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         QnaComment comment = QnaComment.builder()
                 .content(content)
-                .createdAt(LocalDateTime.now())
-                .isAdminComment(false)
+                .isAdminComment("ADMIN".equals(user.getUserType()))
                 .qna(qna)
                 .user(user)
                 .build();
@@ -41,15 +44,15 @@ public class QnaCommentService {
         return commentManager.findByQnaId(qnaId);
     }
 
-
     public void deleteComment(Long commentId, Long userId){
 
         QnaComment comment = commentManager.findById(commentId);
 
         if (!comment.getUser().getId().equals(userId)) {
-            throw new RuntimeException("삭제 권한 없음");
+            throw new IllegalArgumentException("삭제 권한 없음");
         }
 
         comment.setDeletedAt(LocalDateTime.now());
+        commentManager.save(comment);
     }
 }
