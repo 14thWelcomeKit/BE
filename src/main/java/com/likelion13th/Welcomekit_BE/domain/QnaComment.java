@@ -1,6 +1,7 @@
 package com.likelion13th.Welcomekit_BE.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,11 @@ public class QnaComment {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
+
+    @JsonProperty("userid")
+    public Long getUserid() {
+        return user != null ? user.getId() : null;
+    }
 
     @PrePersist
     public void prePersist() {
