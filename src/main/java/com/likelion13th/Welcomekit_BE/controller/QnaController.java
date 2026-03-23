@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/qna")
+@RequestMapping("/api/qna")
 @RequiredArgsConstructor
 public class QnaController {
 
