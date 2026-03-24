@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew compileJava --quiet)",
+      "Bash(node:*)",
+      "Bash(find 'C:\\\\Users\\\\pjyng\\\\OneDrive\\\\바탕 화면\\\\BE' -type f -name *ingo*)",
+      "Bash(grep -o '.\\\\{0,30\\\\}미션.\\\\{0,30\\\\}' \"C:\\\\Users\\\\pjyng\\\\OneDrive\\\\바탕 화면\\\\BE\\\\src\\\\main\\\\resources\\\\static\\\\static\\\\js\\\\main.01b0ce1c.js.map\")"
+    ]
+  }
+}

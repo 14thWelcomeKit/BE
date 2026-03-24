@@ -32,7 +32,7 @@ public class BingoBoardInitializer implements ApplicationRunner {
 		for (int i = 0; i < 25; i++) {
 			BingoCellV1 cell = BingoCellV1.builder()
 				.id((long) (i + 1))
-				.mission(missions[i])
+				.mission(missions[i].getTitle())
 				.status(BingoCellStatusV1.EMPTY)
 				.build();
 			bingoCellV1Repository.save(cell);

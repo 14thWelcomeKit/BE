@@ -2,7 +2,6 @@ package com.likelion13th.Welcomekit_BE.domain.v1;
 
 import com.likelion13th.Welcomekit_BE.domain.Team;
 import com.likelion13th.Welcomekit_BE.domain.enums.v1.BingoCellStatusV1;
-import com.likelion13th.Welcomekit_BE.domain.enums.v1.BingoMissionV1;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,9 +24,8 @@ public class BingoCellV1 {
 	@Column(name = "id")
 	private Long id;
 
-	@Enumerated(EnumType.STRING)
 	@Column(name = "mission", nullable = false)
-	private BingoMissionV1 mission;
+	private String mission;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)

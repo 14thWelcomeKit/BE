@@ -22,6 +22,7 @@ public class TeamBingoBoardResponse {
 	@AllArgsConstructor
 	public static class TeamCellSummary {
 		private Long cellId;
+		private String mission;
 		private BingoCellStatusV1 status;
 		private Boolean isOurTeam;
 		/**

@@ -21,6 +21,7 @@ public class GlobalBingoBoardResponse {
 	@AllArgsConstructor
 	public static class CellSummary {
 		private Long cellId;
+		private String mission;
 		private BingoCellStatusV1 status;
 		/** null 이면 EMPTY */
 		private String imageUrl;
