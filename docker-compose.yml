@@ -1,0 +1,14 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: welcomekit-mysql
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: welcomekit
+    volumes:
+      - welcomekit-mysql-data:/var/lib/mysql
+
+volumes:
+  welcomekit-mysql-data:

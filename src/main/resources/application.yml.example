@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: Welcomekit_BE
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/welcomekit
+    username: root
+    password: CHANGE_ME
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+    hibernate:
+      ddl-auto: update
+
+jwt:
+  secret: CHANGE_ME
+  expiration: 604800000
+
+logging.level:
+  org.hibernate.SQL: debug
+
+springdoc:
+  swagger-ui:
+    path: swagger
+    try-it-out-enabled: true
+    filter: true
+    operations-sorter: method
+    display-request-duration: true
