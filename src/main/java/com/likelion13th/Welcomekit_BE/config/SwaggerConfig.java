@@ -28,7 +28,7 @@ public class SwaggerConfig {
 		return new OpenAPI()
 			.info(info)
 			.servers(List.of(
-				new Server().url("/").description("현재 도메인")
+				new Server().url("https://welcomekit14.hufsglobalikelion.co.kr").description("배포 서버")
 			))
 			.addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
 			.components(new io.swagger.v3.oas.models.Components()
