@@ -10,6 +10,8 @@ import com.likelion13th.Welcomekit_BE.domain.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByUserName(String userName);
 	Optional<User> findUserByStudentNum(String studentNum);
+	Optional<User> findByEmail(String email);
 
 	Boolean existsByStudentNum(String studentNum);
+	Boolean existsByEmail(String email);
 }

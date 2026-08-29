@@ -21,6 +21,10 @@ public class AttendanceSession {
 	@Column(name = "session_date", nullable = false)
 	private LocalDateTime sessionDate; // 출석 체크 날짜
 
+	// QR 재사용/과거 QR 사용 방지를 위한 세션 토큰. 세션 생성 시 발급된다.
+	@Column(name = "token")
+	private String token;
+
 	@OneToMany(mappedBy = "attendanceSession", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Attendance> attendanceList; // 출석한 유저 목록
 }

@@ -18,10 +18,11 @@ public class CustomUserDetailsManager implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = customUserDetailsService.findByStudentNum(username);
+		// 로그인 및 JWT의 principal 식별자는 이메일 기준
+		User user = customUserDetailsService.findByEmail(username);
 		if (user != null) {
 			return new CustomUserDetails(user);
 		}
-		throw new UsernameNotFoundException("User not found with username: ");
+		throw new UsernameNotFoundException("User not found with email: " + username);
 	}
 }

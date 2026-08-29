@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,9 +45,18 @@ public class SecurityConfig {
 				sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedHandler))
 			.authorizeHttpRequests(authorizeRequests -> authorizeRequests
-				.requestMatchers("/", "/index.html").permitAll()
-				.requestMatchers("/api/**").permitAll()
-				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**").permitAll()
+				// 정적 리소스 / 진입점
+				.requestMatchers("/", "/index.html", "/favicon.ico", "/manifest.json", "/robots.txt",
+					"/logo192.png", "/logo512.png", "/asset-manifest.json", "/static/**", "/sw.js").permitAll()
+				// 인증 없이 허용되는 API: 로그인 / 회원가입 / 이메일 인증
+				.requestMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/auth/email/send-code").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/auth/email/verify-code").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/user/join").permitAll()
+				// Swagger 문서
+				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger",
+					"/swagger-resources/**", "/webjars/**").permitAll()
+				// 그 외 모든 요청은 인증 필요
 				.anyRequest().authenticated()
 			);
 

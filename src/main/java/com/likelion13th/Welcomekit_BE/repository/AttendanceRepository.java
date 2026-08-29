@@ -18,6 +18,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
 	List<Attendance> findAllByUserOrderByAttendanceTime(User user);
 
+	List<Attendance> findAllByAttendanceSession(AttendanceSession attendanceSession);
+
 	@Query("SELECT new com.likelion13th.Welcomekit_BE.domain.dto.response.GetTodayAttendanceResponse(" +
 		"u.userName, t.teamName, a.status) " +
 		"FROM attendance a " +

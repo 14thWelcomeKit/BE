@@ -39,6 +39,9 @@ public class User {
 	@Column(name = "student_num", nullable = false)
 	private String studentNum;
 
+	@Column(name = "email", nullable = false, unique = true)
+	private String email;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "user_type", nullable = false)
 	private UserType userType;
@@ -64,6 +67,7 @@ public class User {
 			", userName='" + userName + '\'' +
 			", password='" + password + '\'' +
 			", studentNum='" + studentNum + '\'' +
+			", email='" + email + '\'' +
 			", userType=" + userType +
 			", devPart=" + devPart +
 			", profileImage='" + profileImage + '\'' +

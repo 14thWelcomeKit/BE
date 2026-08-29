@@ -57,9 +57,9 @@ public class ManitoService {
 		manitoRepository.saveAll(manitoList);
 	}
 
-	public String getManito(String userName) {
-		log.info("마니또 조회 기능 실행중 학번 : {}", userName);
-		User user = userRepository.findUserByStudentNum(userName)
+	public String getManito(String email) {
+		log.info("마니또 조회 기능 실행중 email : {}", email);
+		User user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 		Manito manito = manitoRepository.findByUser(user);
 		if (manito == null) {
@@ -68,19 +68,19 @@ public class ManitoService {
 		return manito.getManito().getUserName();
 	}
 
-	public void deleteManito(String studentNum) {
-		User user = userRepository.findUserByStudentNum(studentNum)
+	public void deleteManito(String email) {
+		User user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-		if (user.getUserType() == UserType.ADMIN) {
-			if (user.getUserName().equals("오현우") || user.getUserName().equals("신상현") || user.getUserName()
-				.equals("오혀누")) {
-				manitoRepository.deleteAll();
-			}
+		// 이름 하드코딩 제거: 운영진(ADMIN) 권한이면 초기화 허용
+		if (user.getUserType() != UserType.ADMIN) {
+			log.error("마니또 초기화 권한 없음");
+			throw new CustomException(ErrorCode.PERMISSION_ERROR);
 		}
+		manitoRepository.deleteAll();
 	}
 
-	public void selectManito(String studentNum, SelectManitoRequest selectManitoRequest) {
-		User user = userRepository.findUserByStudentNum(studentNum)
+	public void selectManito(String email, SelectManitoRequest selectManitoRequest) {
+		User user = userRepository.findByEmail(email)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		Manito manito = manitoRepository.findByManito(user);

@@ -5,11 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class LoginRequest {
+public class SendVerificationCodeRequest {
 	@NotBlank
 	@Email
 	private String email;
-
-	@NotBlank
-	private String password;
 }

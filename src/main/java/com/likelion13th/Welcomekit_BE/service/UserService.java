@@ -16,6 +16,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -46,20 +47,76 @@ public class UserService {
 	@Autowired
 	private final PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private final EmailVerificationService emailVerificationService;
+
+	@Value("${app.signup.admin-invite-code:}")
+	private String adminInviteCode;
+
 	public void createUser(CreateUserRequest createUserRequest) {
+		String email = createUserRequest.getEmail();
+
+		// 1) 이메일 인증 완료 여부 확인 (인증 안 됐으면 가입 불가)
+		emailVerificationService.assertVerified(email);
+
+		// 2) 중복 검사
+		if (userRepository.existsByEmail(email)) {
+			throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
+		}
+		if (userRepository.existsByStudentNum(createUserRequest.getStudentNum())) {
+			throw new CustomException(ErrorCode.STUDENT_NUM_ALREADY_EXISTS);
+		}
+
+		// 3) 권한 결정: 클라이언트가 보낸 userType은 신뢰하지 않는다.
+		//    올바른 운영진 초대코드를 입력한 경우에만 ADMIN, 그 외에는 무조건 BABY_LION.
+		UserType userType = resolveUserType(createUserRequest.getInviteCode());
+
 		User user = new User();
 		user.setUserName(createUserRequest.getName());
-		user.setUserType(createUserRequest.getUserType());
+		user.setUserType(userType);
 		user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
 		user.setStudentNum(createUserRequest.getStudentNum());
+		user.setEmail(email);
 		user.setDevPart(createUserRequest.getDevPart());
 		user.setProfileImage("");
 		user.setHasReadWelcome(false);
 		userRepository.save(user);
 	}
 
+	private UserType resolveUserType(String inviteCode) {
+		if (inviteCode == null || inviteCode.isBlank()) {
+			return UserType.BABY_LION;
+		}
+		// 초대코드를 입력했는데 설정값과 다르면 오류(오타로 인한 조용한 BABY_LION 가입 방지)
+		if (adminInviteCode == null || adminInviteCode.isBlank() || !adminInviteCode.equals(inviteCode)) {
+			throw new CustomException(ErrorCode.INVALID_INVITE_CODE);
+		}
+		return UserType.ADMIN;
+	}
+
+	/**
+	 * 운영진 승격: 이미 ADMIN인 사용자가 특정 유저를 ADMIN으로 올린다.
+	 * (초대코드 방식의 백업 수단)
+	 */
+	public void promoteToAdmin(User requester, Long targetUserId) {
+		if (requester.getUserType() != UserType.ADMIN) {
+			log.error("운영진 승격 권한 없음");
+			throw new CustomException(ErrorCode.PERMISSION_ERROR);
+		}
+		User target = userRepository.findById(targetUserId)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+		target.setUserType(UserType.ADMIN);
+		userRepository.save(target);
+	}
+
 	public User getUserByStudentNum(String studentNum) {
 		return userRepository.findUserByStudentNum(studentNum)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+	}
+
+	// 로그인 principal(이메일)로 유저 조회
+	public User getUserByEmail(String email) {
+		return userRepository.findByEmail(email)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 	}
 
@@ -79,10 +136,10 @@ public class UserService {
 		}).toList();
 	}
 
-	public List<String> getAllNameExceptMe(String studentNum) {
+	public List<String> getAllNameExceptMe(String email) {
 		return userRepository.findAll()
 			.stream()
-			.filter(user -> !user.getStudentNum().equals(studentNum))
+			.filter(user -> !user.getEmail().equals(email))
 			.map(User::getUserName)
 			.toList();
 	}

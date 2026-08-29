@@ -25,19 +25,19 @@ public class BingoManager {
 	@Autowired
 	private final TeamService teamService;
 
-	public List<GetMyBingoResponse> getMyBingo(String studentNum) {
-		User user = userService.getUserByStudentNum(studentNum);
+	public List<GetMyBingoResponse> getMyBingo(String email) {
+		User user = userService.getUserByEmail(email);
 		return bingoService.getMyBingo(user);
 	}
 
-	public String revealBingoCell(String studentNum, Long id) {
-		User user = userService.getUserByStudentNum(studentNum);
+	public String revealBingoCell(String email, Long id) {
+		User user = userService.getUserByEmail(email);
 		return bingoService.revealBingoCell(user, id);
 	}
 
 	public void approveTeam(UserDetails userDetails, String teamName) {
 		Team team = teamService.getTeam(teamName);
-		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		User user = userService.getUserByEmail(userDetails.getUsername());
 		bingoService.approveTeam(user, team);
 	}
 }

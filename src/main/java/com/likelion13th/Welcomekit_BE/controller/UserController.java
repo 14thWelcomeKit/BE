@@ -17,10 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.likelion13th.Welcomekit_BE.domain.dto.request.ChangePasswordRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.PromoteAdminRequest;
 import com.likelion13th.Welcomekit_BE.manager.UserManager;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,7 +35,7 @@ public class UserController {
 	private final UserManager userManager;
 
 	@PostMapping("/join")
-	ResponseEntity<?> createUser(@RequestBody CreateUserRequest createUserRequest) {
+	ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
 		userManager.createUser(createUserRequest);
 		return ResponseEntity.ok("성공적으로 생성했습니다!");
 	}
@@ -51,6 +53,14 @@ public class UserController {
 	@GetMapping("/total/admin")
 	ResponseEntity<?> getAllAdmin(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getTotalAdmin(userDetails));
+	}
+
+	@Operation(summary = "운영진 승격", description = "운영진(ADMIN)만 특정 유저를 운영진으로 승격할 수 있습니다.")
+	@PostMapping("/promote")
+	ResponseEntity<?> promoteToAdmin(@AuthenticationPrincipal UserDetails userDetails,
+		@Valid @RequestBody PromoteAdminRequest request) {
+		userManager.promoteToAdmin(userDetails, request.getTargetUserId());
+		return ResponseEntity.ok("운영진으로 승격되었습니다.");
 	}
 
 	@GetMapping("/info")

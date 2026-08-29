@@ -16,8 +16,8 @@ public class AuthService {
 	@Autowired
 	private final UserRepository userRepository;
 
-	public User findByStudentNum(String studentNum) {
-		return userRepository.findUserByStudentNum(studentNum).orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
+	public User findByEmail(String email) {
+		return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
 	}
 
 	public boolean existsByStudentNum(String userId) {
