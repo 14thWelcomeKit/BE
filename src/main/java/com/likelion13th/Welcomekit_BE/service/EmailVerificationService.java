@@ -75,6 +75,41 @@ public class EmailVerificationService {
 		sendMail(email, code);
 	}
 
+	/**
+	 * 비밀번호 재설정(찾기)용 인증코드 발송.
+	 * 회원가입용 sendCode()와 달리, 이미 가입된 이메일에만 발송한다(가입돼 있지 않으면 에러).
+	 */
+	@Transactional
+	public void sendCodeForReset(String email) {
+		validateDomain(email);
+
+		if (!userRepository.existsByEmail(email)) {
+			throw new CustomException(ErrorCode.USER_NOT_FOUND);
+		}
+
+		String code = generateCode();
+		LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(codeTtlMinutes);
+
+		// 이메일당 최신 코드 1건만 유지(있으면 갱신, 없으면 생성)
+		EmailVerification verification = emailVerificationRepository.findByEmail(email)
+			.map(existing -> {
+				existing.setCode(code);
+				existing.setExpiresAt(expiresAt);
+				existing.setVerified(false);
+				return existing;
+			})
+			.orElseGet(() -> EmailVerification.builder()
+				.email(email)
+				.code(code)
+				.expiresAt(expiresAt)
+				.verified(false)
+				.build());
+
+		emailVerificationRepository.save(verification);
+
+		sendMail(email, code);
+	}
+
 	@Transactional
 	public void verifyCode(String email, String code) {
 		EmailVerification verification = emailVerificationRepository.findByEmail(email)

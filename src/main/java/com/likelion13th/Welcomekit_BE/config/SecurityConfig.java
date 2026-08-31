@@ -52,6 +52,8 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/auth/email/send-code").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/auth/email/verify-code").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/auth/reset-password/send-code").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/user/join").permitAll()
 				// Swagger 문서
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger",
