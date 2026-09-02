@@ -1,9 +1,6 @@
 package com.likelion13th.Welcomekit_BE.controller;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,12 +17,14 @@ import com.likelion13th.Welcomekit_BE.service.EmailVerificationService;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "인증/이메일", description = "로그인(JWT 발급)과 회원가입용 이메일 인증코드 발송·확인 API. 로그인 식별자는 이메일 기준입니다.")
 public class AuthController {
 
 	@Autowired
@@ -37,6 +36,7 @@ public class AuthController {
 	@Autowired
 	private final UserService userService;
 
+	@Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다. 성공 시 JWT(Access Token)를 발급하며, 토큰의 주체(principal)는 이메일 기준입니다.")
 	@PostMapping("/sign-in")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		JwtAuthenticationResponse jwtAuthenticationResponse = authManager.authenticateUser(loginRequest);

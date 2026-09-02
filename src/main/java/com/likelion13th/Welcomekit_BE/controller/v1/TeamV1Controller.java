@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/team")
+@RequestMapping("/v1/team")
 @Tag(name = "14기 팀 V1", description = "14기 팀 정보 및 빙고 활동 로그 API")
 public class TeamV1Controller {
 

@@ -22,23 +22,27 @@ import com.likelion13th.Welcomekit_BE.domain.dto.response.MyAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.manager.AttendanceSessionManager;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/attendance")
+@RequestMapping("/attendance")
+@Tag(name = "출석", description = "QR 기반 출석 체크와 개인 출석 조회, 운영진 전용 출석 세션·상태 관리 API.")
 public class AttendanceSessionController {
 
 	@Autowired
 	private final AttendanceSessionManager attendanceSessionManager;
 
+	@Operation(summary = "출석용 QR 이미지 생성", description = "오늘 세션의 토큰이 포함된 출석용 QR 이미지를 생성해 응답으로 내려줍니다.")
 	@GetMapping("generate-qr")
 	void generateQRCode(@AuthenticationPrincipal UserDetails userDetails, HttpServletResponse response) {
 		attendanceSessionManager.generateQR(userDetails.getUsername(), response);
 	}
 
+	@Operation(summary = "출석 체크(QR 스캔)", description = "QR에 담긴 token으로 출석을 처리합니다. 그날 세션 토큰과 일치할 때만 인정되며, 불일치 시 최신 QR 재스캔이 필요합니다. 개인 출석 칸이 없으면 그 자리에서 생성합니다.")
 	@PostMapping("/success")
 	public ResponseEntity<String> qrSuccess(
 		@AuthenticationPrincipal UserDetails userDetails,
@@ -47,6 +51,7 @@ public class AttendanceSessionController {
 		return ResponseEntity.ok(attendanceSessionManager.markAttendance(userDetails.getUsername(), token));
 	}
 
+	@Operation(summary = "내 출석 내역 조회", description = "로그인한 사용자의 전체 출석 세션별 출석 상태 목록을 조회합니다.")
 	@GetMapping("/my-attendance")
 	public ResponseEntity<?> getMyAttendance(
 		@AuthenticationPrincipal UserDetails userDetails) {
@@ -54,6 +59,7 @@ public class AttendanceSessionController {
 		return ResponseEntity.ok(myAttendance);
 	}
 
+	@Operation(summary = "오늘 내 출석 상태 조회", description = "로그인한 사용자의 오늘 세션 출석 상태를 조회합니다.")
 	@GetMapping("/today/attendance")
 	public ResponseEntity<?> getTodayAttendance(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(attendanceSessionManager.getTodayAttendance(userDetails.getUsername()));

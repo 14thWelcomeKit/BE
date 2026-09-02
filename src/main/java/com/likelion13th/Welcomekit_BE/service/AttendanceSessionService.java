@@ -44,7 +44,7 @@ public class AttendanceSessionService {
 	private final AttendanceRepository attendanceRepository;
 
 	// QR용 베이스 URL(환경에 따라 다르면 설정값으로 주입)
-	@Value("${app.attendance.qr-base-url:https://welcomekitbe.lion.it.kr/api/attendance/success}")
+	@Value("${app.attendance.qr-base-url:https://welcomekitbe.lion.it.kr/api/v3/welcome-kit/attendance/success}")
 	private String qrBaseUrl;
 
 	// 세션 생성 시 발급되는 토큰 생성기
