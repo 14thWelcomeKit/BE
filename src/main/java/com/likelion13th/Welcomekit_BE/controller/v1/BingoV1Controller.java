@@ -22,7 +22,6 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/bingo")
 @Tag(name = "14기 빙고 V1", description = "14기 전용 글로벌 5x5 빙고 보드 API. 모든 팀이 하나의 보드를 공유하며 미션 사진을 업로드해 12시간 독점을 겨룹니다.")
 public class BingoV1Controller {
