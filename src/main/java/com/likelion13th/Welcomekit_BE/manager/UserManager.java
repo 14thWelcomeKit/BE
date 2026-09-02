@@ -28,7 +28,7 @@ public class UserManager {
 	}
 
 	public List<GetAllBabyLionResponse> getTotalBabyLion(UserDetails userDetails) {
-		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		User user = userService.getUserByEmail(userDetails.getUsername());
 		return userService.getTotalBabyLion(user);
 	}
 
@@ -37,27 +37,32 @@ public class UserManager {
 	}
 
 	public List<GetAllBabyLionResponse> getTotalAdmin(UserDetails userDetails) {
-		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		User user = userService.getUserByEmail(userDetails.getUsername());
 		return userService.getTotalAdmin(user);
 	}
 
 	public GetMyInfoResponse getMyInfo(UserDetails userDetails) {
-		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		User user = userService.getUserByEmail(userDetails.getUsername());
 		return userService.getMyInfo(user);
 	}
 
+	public void promoteToAdmin(UserDetails userDetails, Long targetUserId) {
+		User requester = userService.getUserByEmail(userDetails.getUsername());
+		userService.promoteToAdmin(requester, targetUserId);
+	}
+
 	public void changePassword(UserDetails userDetails, String currentPassword, String newPassword) {
-		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		User user = userService.getUserByEmail(userDetails.getUsername());
 		userService.changePassword(user, currentPassword, newPassword);
 	}
 
 	public void saveProfileImage(MultipartFile file, UserDetails userDetails) {
-		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		User user = userService.getUserByEmail(userDetails.getUsername());
 		userService.saveProfileImage(file, user);
 	}
 
 	public Resource getProfileImage(UserDetails userDetails) {
-		User user = userService.getUserByStudentNum(userDetails.getUsername());
+		User user = userService.getUserByEmail(userDetails.getUsername());
 		return userService.getProfileImage(user);
 	}
 

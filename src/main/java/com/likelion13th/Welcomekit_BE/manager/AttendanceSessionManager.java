@@ -1,13 +1,18 @@
 package com.likelion13th.Welcomekit_BE.manager;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.likelion13th.Welcomekit_BE.domain.AttendanceSession;
 import com.likelion13th.Welcomekit_BE.domain.User;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.AttendanceDetailResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.AttendanceSessionSummaryResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetTodayAttendanceResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.MyAttendanceResponse;
+import com.likelion13th.Welcomekit_BE.domain.enums.AttendanceStatus;
 import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
 import com.likelion13th.Welcomekit_BE.exception.CustomException;
 import com.likelion13th.Welcomekit_BE.exception.ErrorCode;
@@ -28,29 +33,68 @@ public class AttendanceSessionManager {
 	@Autowired
 	private final UserService userService;
 
-	public void generateQR(String studentNum, HttpServletResponse response) {
-		User user = userService.getUserByStudentNum(studentNum);
+	public void generateQR(String email, HttpServletResponse response) {
+		User user = userService.getUserByEmail(email);
 		if (user.getUserType() == UserType.BABY_LION) {
 			log.error("QR 생성할떄 permission error");
 			throw new CustomException(ErrorCode.PERMISSION_ERROR);
 		}
 		List<User> totalBabyLion = userService.getTotalBabyLionUser();
-		attendanceSessionService.getTodaySession(totalBabyLion);
-		attendanceSessionService.generateQR(response);
+		AttendanceSession session = attendanceSessionService.getTodaySession(totalBabyLion);
+		attendanceSessionService.generateQR(response, session.getToken());
 	}
 
-	public String markAttendance(String studentNum) {
-		User user = userService.getUserByStudentNum(studentNum);
-		return attendanceSessionService.markAttendance(user);
+	public String markAttendance(String email, String token) {
+		User user = userService.getUserByEmail(email);
+		return attendanceSessionService.markAttendance(user, token);
 	}
 
-	public List<MyAttendanceResponse> getMyAttendance(String studentNum) {
-		User user = userService.getUserByStudentNum(studentNum);
+	public List<MyAttendanceResponse> getMyAttendance(String email) {
+		User user = userService.getUserByEmail(email);
 		return attendanceSessionService.getMyAttendance(user);
 	}
 
-	public List<GetTodayAttendanceResponse> getTodayAttendance(String studentNum) {
-		User user = userService.getUserByStudentNum(studentNum);
+	public List<GetTodayAttendanceResponse> getTodayAttendance(String email) {
+		User user = userService.getUserByEmail(email);
 		return attendanceSessionService.getTodayAttendance(user);
+	}
+
+	// ══════════════════════════════════════════════════════════
+	// 운영진(ADMIN) 전용 출석 관리 (C-1 + C-2)
+	// ══════════════════════════════════════════════════════════
+
+	public List<AttendanceSessionSummaryResponse> getAllSessions(String email) {
+		requireAdmin(email);
+		return attendanceSessionService.getAllSessions();
+	}
+
+	public List<AttendanceDetailResponse> getSessionAttendances(String email, Long sessionId) {
+		requireAdmin(email);
+		return attendanceSessionService.getSessionAttendances(sessionId);
+	}
+
+	public AttendanceDetailResponse updateAttendanceStatus(String email, Long attendanceId, AttendanceStatus status) {
+		requireAdmin(email);
+		return attendanceSessionService.updateAttendanceStatus(attendanceId, status);
+	}
+
+	public AttendanceSessionSummaryResponse createSession(String email, LocalDateTime sessionDate) {
+		requireAdmin(email);
+		List<User> totalBabyLion = userService.getTotalBabyLionUser();
+		return attendanceSessionService.createSession(sessionDate, totalBabyLion);
+	}
+
+	public void deleteSession(String email, Long sessionId) {
+		requireAdmin(email);
+		attendanceSessionService.deleteSession(sessionId);
+	}
+
+	private User requireAdmin(String email) {
+		User user = userService.getUserByEmail(email);
+		if (user.getUserType() != UserType.ADMIN) {
+			log.error("출석 관리 권한 없음: {}", email);
+			throw new CustomException(ErrorCode.PERMISSION_ERROR);
+		}
+		return user;
 	}
 }

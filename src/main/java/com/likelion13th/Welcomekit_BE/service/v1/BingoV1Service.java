@@ -107,8 +107,8 @@ public class BingoV1Service {
 	// ══════════════════════════════════════════════════════════
 
 	@Transactional(readOnly = true)
-	public TeamBingoBoardResponse getTeamBoard(String studentNum) {
-		Team myTeam = requireTeam(userService.getUserByStudentNum(studentNum));
+	public TeamBingoBoardResponse getTeamBoard(String email) {
+		Team myTeam = requireTeam(userService.getUserByEmail(email));
 
 		List<TeamBingoBoardResponse.TeamCellSummary> summaries = bingoCellV1Repository.findAllByOrderByIdAsc()
 			.stream()
@@ -145,8 +145,8 @@ public class BingoV1Service {
 	// ══════════════════════════════════════════════════════════
 
 	@Transactional(readOnly = true)
-	public TeamBingoCellDetailResponse getTeamCellDetail(String studentNum, Long cellId) {
-		requireTeam(userService.getUserByStudentNum(studentNum)); // 팀 소속 여부 검증
+	public TeamBingoCellDetailResponse getTeamCellDetail(String email, Long cellId) {
+		requireTeam(userService.getUserByEmail(email)); // 팀 소속 여부 검증
 		BingoCellV1 cell = findCell(cellId);
 		BingoCellStatusV1 effective = effectiveStatus(cell);
 
@@ -178,8 +178,8 @@ public class BingoV1Service {
 	// ══════════════════════════════════════════════════════════
 
 	@Transactional
-	public UploadMissionResponse uploadMission(String studentNum, Long cellId, MultipartFile file) {
-		Team myTeam = requireTeam(userService.getUserByStudentNum(studentNum));
+	public UploadMissionResponse uploadMission(String email, Long cellId, MultipartFile file) {
+		Team myTeam = requireTeam(userService.getUserByEmail(email));
 
 		// 비관적 쓰기 잠금으로 동시 업로드를 직렬화
 		BingoCellV1 cell = bingoCellV1Repository.findByIdWithPessimisticLock(cellId)
@@ -230,8 +230,8 @@ public class BingoV1Service {
 	// ══════════════════════════════════════════════════════════
 
 	@Transactional
-	public UploadMissionResponse updateMission(String studentNum, Long cellId, MultipartFile file) {
-		Team myTeam = requireTeam(userService.getUserByStudentNum(studentNum));
+	public UploadMissionResponse updateMission(String email, Long cellId, MultipartFile file) {
+		Team myTeam = requireTeam(userService.getUserByEmail(email));
 
 		BingoCellV1 cell = bingoCellV1Repository.findByIdWithPessimisticLock(cellId)
 			.orElseThrow(() -> new CustomException(ErrorCode.CELL_NOT_FOUND));
@@ -265,8 +265,8 @@ public class BingoV1Service {
 	// ══════════════════════════════════════════════════════════
 
 	@Transactional(readOnly = true)
-	public TeamInfoV1Response getTeamInfo(String studentNum) {
-		User user = userService.getUserByStudentNum(studentNum);
+	public TeamInfoV1Response getTeamInfo(String email) {
+		User user = userService.getUserByEmail(email);
 		Team myTeam = requireTeam(user);
 
 		long occupiedCount = bingoCellV1Repository.countByOwnerTeamAndStatus(myTeam, BingoCellStatusV1.OCCUPIED);
@@ -302,8 +302,8 @@ public class BingoV1Service {
 	// ══════════════════════════════════════════════════════════
 
 	@Transactional(readOnly = true)
-	public TeamActivitiesResponse getTeamActivities(String studentNum) {
-		Team myTeam = requireTeam(userService.getUserByStudentNum(studentNum));
+	public TeamActivitiesResponse getTeamActivities(String email) {
+		Team myTeam = requireTeam(userService.getUserByEmail(email));
 
 		List<TeamActivitiesResponse.ActivityEntry> entries = activityLogV1Repository
 			.findByTeamOrderByTimestampDesc(myTeam)

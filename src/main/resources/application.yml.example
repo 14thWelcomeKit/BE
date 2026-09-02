@@ -13,9 +13,29 @@ spring:
     hibernate:
       ddl-auto: update
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 jwt:
   secret: CHANGE_ME
   expiration: 604800000
+
+app:
+  signup:
+    email-domain: ${SIGNUP_EMAIL_DOMAIN:}
+    admin-invite-code: ${ADMIN_INVITE_CODE:}
+    code-ttl-minutes: ${SIGNUP_CODE_TTL_MINUTES:10}
+  attendance:
+    qr-base-url: ${ATTENDANCE_QR_BASE_URL:https://welcomekitbe.lion.it.kr/api/attendance/success}
 
 logging.level:
   org.hibernate.SQL: debug

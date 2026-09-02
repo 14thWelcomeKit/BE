@@ -28,7 +28,7 @@ public class AuthManager {
 
 	public JwtAuthenticationResponse authenticateUser(@Valid LoginRequest loginRequest) {
 		try {
-			User user = authService.findByStudentNum(loginRequest.getStudentNum());
+			User user = authService.findByEmail(loginRequest.getEmail());
 			if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
 				throw new BadCredentialsException("Invalid credentials. Please check your username and password.");
 			}

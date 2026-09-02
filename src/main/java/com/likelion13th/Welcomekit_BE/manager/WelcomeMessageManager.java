@@ -21,8 +21,8 @@ public class WelcomeMessageManager {
 	@Autowired
 	private final UserService userService;
 
-	public GetWelcomeMessageResponse getMyWelcomeMessage(String studentNum) {
-		User receiver = userService.getUserByStudentNum(studentNum);
+	public GetWelcomeMessageResponse getMyWelcomeMessage(String email) {
+		User receiver = userService.getUserByEmail(email);
 		WelcomeMessage welcomeMessage = welcomeMessageService.getLatestByReceiver(receiver);
 
 		return GetWelcomeMessageResponse.builder()
@@ -34,8 +34,8 @@ public class WelcomeMessageManager {
 			.build();
 	}
 
-	public UpdateWelcomeReadResponse updateHasReadWelcome(String studentNum) {
-		User user = userService.getUserByStudentNum(studentNum);
+	public UpdateWelcomeReadResponse updateHasReadWelcome(String email) {
+		User user = userService.getUserByEmail(email);
 		userService.updateHasReadWelcome(user, true);
 
 		return UpdateWelcomeReadResponse.builder()

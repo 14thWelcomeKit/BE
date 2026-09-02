@@ -20,4 +20,8 @@ public class CustomUserDetailsService {
 	public User findByStudentNum(String studentNum) {
 		return userRepository.findUserByStudentNum(studentNum).orElse(null);
 	}
+
+	public User findByEmail(String email) {
+		return userRepository.findByEmail(email).orElse(null);
+	}
 }
