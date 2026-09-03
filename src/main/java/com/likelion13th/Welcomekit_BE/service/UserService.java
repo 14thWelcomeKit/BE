@@ -176,6 +176,7 @@ public class UserService {
 		getMyInfoResponse.setName(user.getUserName());
 		getMyInfoResponse.setTeamName(user.getTeam() != null ? user.getTeam().getTeamName() : null);
 		getMyInfoResponse.setHasReadWelcome(user.getHasReadWelcome());
+		getMyInfoResponse.setUserType(user.getUserType());
 		return getMyInfoResponse;
 	}
 

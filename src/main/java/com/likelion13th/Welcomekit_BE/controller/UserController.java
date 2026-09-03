@@ -67,7 +67,7 @@ public class UserController {
 		return ResponseEntity.ok("운영진으로 승격되었습니다.");
 	}
 
-	@Operation(summary = "내 정보 조회", description = "로그인한 사용자의 프로필 정보를 조회합니다.")
+	@Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다. 응답의 userType(ADMIN/BABY_LION)으로 운영진 여부를 판단할 수 있습니다.")
 	@GetMapping("/info")
 	ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getMyInfo(userDetails));
