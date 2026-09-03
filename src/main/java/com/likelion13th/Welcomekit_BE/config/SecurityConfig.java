@@ -49,12 +49,12 @@ public class SecurityConfig {
 				.requestMatchers("/", "/index.html", "/favicon.ico", "/manifest.json", "/robots.txt",
 					"/logo192.png", "/logo512.png", "/asset-manifest.json", "/static/**", "/sw.js").permitAll()
 				// 인증 없이 허용되는 API: 로그인 / 회원가입 / 이메일 인증
-				.requestMatchers(HttpMethod.POST, "/api/auth/sign-in").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/auth/email/send-code").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/auth/email/verify-code").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/auth/reset-password/send-code").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
-				.requestMatchers(HttpMethod.POST, "/api/user/join").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/auth/sign-in").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/auth/email/send-code").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/auth/email/verify-code").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/auth/reset-password/send-code").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/auth/reset-password").permitAll()
+				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/user/join").permitAll()
 				// Swagger 문서
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger",
 					"/swagger-resources/**", "/webjars/**").permitAll()

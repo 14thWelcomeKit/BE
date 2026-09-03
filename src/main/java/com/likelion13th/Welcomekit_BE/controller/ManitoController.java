@@ -14,11 +14,13 @@ import com.likelion13th.Welcomekit_BE.domain.dto.request.SelectManitoRequest;
 import com.likelion13th.Welcomekit_BE.service.ManitoService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/manito")
+@RequestMapping("/manito")
+@Tag(name = "마니또", description = "마니또 배정 생성/조회/선택/초기화 API.")
 public class ManitoController {
 
 	private final ManitoService manitoService;

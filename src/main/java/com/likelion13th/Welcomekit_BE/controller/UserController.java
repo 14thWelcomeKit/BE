@@ -21,33 +21,39 @@ import com.likelion13th.Welcomekit_BE.manager.UserManager;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/user")
+@Tag(name = "회원", description = "회원가입, 회원 목록/내 정보 조회, 비밀번호 변경, 운영진 승격, 프로필 이미지 API.")
 public class UserController {
 
 	@Autowired
 	private final UserManager userManager;
 
+	@Operation(summary = "회원가입", description = "이메일 인증 완료 후 회원가입합니다. 권한(userType)은 클라이언트가 지정하지 않으며, 초대코드 일치 시 ADMIN, 아니면 BABY_LION으로 서버가 결정합니다.")
 	@PostMapping("/join")
 	ResponseEntity<?> createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
 		userManager.createUser(createUserRequest);
 		return ResponseEntity.ok("성공적으로 생성했습니다!");
 	}
 
+	@Operation(summary = "전체 아기사자(BABY_LION) 목록 조회", description = "일반 회원(BABY_LION) 전체 목록을 조회합니다.")
 	@GetMapping("/total/baby_lion")
 	ResponseEntity<?> getAllBabyLion(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getTotalBabyLion(userDetails));
 	}
 
+	@Operation(summary = "나를 제외한 전체 회원 목록 조회", description = "로그인한 본인을 제외한 전체 회원 목록을 조회합니다.")
 	@GetMapping("/total/exceptMe")
 	ResponseEntity<?> getAllExceptMe(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getTotalExceptMe(userDetails));
 	}
 
+	@Operation(summary = "전체 운영진(ADMIN) 목록 조회", description = "운영진(ADMIN) 전체 목록을 조회합니다.")
 	@GetMapping("/total/admin")
 	ResponseEntity<?> getAllAdmin(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getTotalAdmin(userDetails));
@@ -61,11 +67,13 @@ public class UserController {
 		return ResponseEntity.ok("운영진으로 승격되었습니다.");
 	}
 
+	@Operation(summary = "내 정보 조회", description = "로그인한 사용자의 프로필 정보를 조회합니다.")
 	@GetMapping("/info")
 	ResponseEntity<?> getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(userManager.getMyInfo(userDetails));
 	}
 
+	@Operation(summary = "비밀번호 변경(마이페이지)", description = "로그인 상태에서 현재 비밀번호를 확인한 뒤 새 비밀번호로 변경합니다. (비밀번호 재설정/찾기와는 별개)")
 	@PostMapping("/password")
 	ResponseEntity<?> changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody
 	ChangePasswordRequest changePasswordRequest
