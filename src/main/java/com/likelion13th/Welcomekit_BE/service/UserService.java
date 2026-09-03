@@ -193,6 +193,23 @@ public class UserService {
 		userRepository.save(user);
 	}
 
+	/**
+	 * 비밀번호 재설정(찾기): 로그인 없이, 이메일 인증코드 검증이 완료된 상태에서만 새 비밀번호로 재설정한다.
+	 * - 이메일 인증 완료(verified) + 미만료 상태를 강제 확인
+	 * - 현재 비밀번호는 요구하지 않음(비밀번호를 잊은 상황이므로)
+	 */
+	public void resetPassword(String email, String newPassword) {
+		// 1) 이메일 인증 완료 여부 확인 (verify-code 통과 안 했으면 재설정 불가)
+		emailVerificationService.assertVerified(email);
+
+		// 2) 대상 사용자 조회
+		User user = getUserByEmail(email);
+
+		// 3) 새 비밀번호로 갱신
+		user.setPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
+	}
+
 	public void saveProfileImage(MultipartFile file, User user) {
 		String studentNum = user.getStudentNum();
 		Path uploadDir = Paths.get("/app/external-profile/" + studentNum);
