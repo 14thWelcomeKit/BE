@@ -21,6 +21,7 @@ public enum ErrorCode {
 	INVALID_IMAGE_FORMAT(HttpStatus.BAD_REQUEST, "INVALID IMAGE FORMAT"),
 	IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "IMAGE NOT FOUND"),
 	UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "User authentication is required."),
+	LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
 	WELCOME_MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "Welcome message does not exist"),
 
 	// ── 회원가입 / 이메일 인증 ──
