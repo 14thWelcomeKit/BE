@@ -31,6 +31,9 @@ public class PhotoListResponse {
 		@Schema(description = "제목", example = "14기 MT 스케치")
 		private final String title;
 
+		@Schema(description = "기수 카테고리", example = "14기")
+		private final String category;
+
 		@Schema(description = "썸네일(첫 번째 사진) URL. 사진이 없으면 null", example = "https://.../thumb.jpg")
 		private final String thumbnailUrl;
 
