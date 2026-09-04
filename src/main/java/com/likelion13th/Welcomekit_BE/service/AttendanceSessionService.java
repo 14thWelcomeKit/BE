@@ -177,14 +177,38 @@ public class AttendanceSessionService {
 		return list;
 	}
 
-	public List<GetTodayAttendanceResponse> getTodayAttendance(User user) {
-		List<GetTodayAttendanceResponse> attendanceResponses =
-			attendanceRepository.findTodayAttendance(LocalDateTime.now().toLocalDate().atStartOfDay());
-		if (attendanceResponses.isEmpty()) {
-			log.error("세션이 없습니다.");
-			throw new CustomException(ErrorCode.SESSION_NOT_FOUND);
+	/**
+	 * 오늘 세션의 전체 출석 현황 조회(운영진 출석부용).
+	 * - 오늘 세션이 없으면 SESSION_NOT_FOUND (리스트가 비었다고 404를 내지 않는다)
+	 * - 세션 생성 이후 가입한 BABY_LION은 출석 레코드가 없을 수 있으므로, 조회 시 ABSENT로 자동 보정한다.
+	 */
+	@Transactional
+	public List<GetTodayAttendanceResponse> getTodayAttendance(List<User> totalBabyLion) {
+		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
+		AttendanceSession session = attendanceSessionRepository.findTopBySessionDateAfter(startOfToday)
+			.orElseThrow(() -> {
+				log.error("오늘 출석 세션이 없습니다.");
+				return new CustomException(ErrorCode.SESSION_NOT_FOUND);
+			});
+
+		// 세션에 출석 레코드가 없는 BABY_LION을 결석(ABSENT)으로 보정 저장
+		fillMissingAttendances(session, totalBabyLion);
+
+		return attendanceRepository.findTodayAttendance(startOfToday);
+	}
+
+	/** 세션에 출석 레코드가 없는 BABY_LION에게 ABSENT 레코드를 생성해 저장한다. */
+	private void fillMissingAttendances(AttendanceSession session, List<User> totalBabyLion) {
+		for (User babyLion : totalBabyLion) {
+			boolean exists = attendanceRepository.findByUserAndAttendanceSession(babyLion, session).isPresent();
+			if (!exists) {
+				Attendance attendance = new Attendance();
+				attendance.setUser(babyLion);
+				attendance.setAttendanceSession(session);
+				attendance.setStatus(AttendanceStatus.ABSENT);
+				attendanceRepository.save(attendance);
+			}
 		}
-		return attendanceResponses;
 	}
 
 	// ══════════════════════════════════════════════════════════
@@ -211,10 +235,18 @@ public class AttendanceSessionService {
 			.toList();
 	}
 
-	/** 특정 세션의 출석 상세(사람별) 조회 */
-	public List<AttendanceDetailResponse> getSessionAttendances(Long sessionId) {
+	/**
+	 * 특정 세션의 출석 상세(사람별) 조회.
+	 * 세션 생성 이후 가입한 BABY_LION은 출석 레코드가 없을 수 있으므로, 조회 시 ABSENT로 자동 보정한다.
+	 */
+	@Transactional
+	public List<AttendanceDetailResponse> getSessionAttendances(Long sessionId, List<User> totalBabyLion) {
 		AttendanceSession session = attendanceSessionRepository.findById(sessionId)
 			.orElseThrow(() -> new CustomException(ErrorCode.SESSION_NOT_FOUND));
+
+		// 세션에 출석 레코드가 없는 BABY_LION을 결석(ABSENT)으로 보정 저장
+		fillMissingAttendances(session, totalBabyLion);
+
 		return attendanceRepository.findAllByAttendanceSession(session).stream()
 			.map(this::toDetail)
 			.toList();
