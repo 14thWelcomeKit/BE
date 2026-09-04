@@ -7,12 +7,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.WelcomeKitPhoto;
 import com.likelion13th.Welcomekit_BE.domain.WelcomeKitPhotoImage;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateWelcomeKitPhotoRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoListResponse;
+import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
+import com.likelion13th.Welcomekit_BE.exception.PhotoException;
 import com.likelion13th.Welcomekit_BE.repository.WelcomeKitPhotoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,19 +29,16 @@ public class WelcomeKitPhotoService {
 	private static final int DEFAULT_SIZE = 12;
 
 	private final WelcomeKitPhotoRepository photoRepository;
+	private final UserService userService;
 
-	/**
-	 * 사진첩 게시글을 게시일(createdAt) 내림차순으로 페이지네이션 조회한다.
-	 * page 는 0-based, 잘못된 값은 안전한 기본값으로 보정한다.
-	 * category 가 주어지면 해당 기수 게시글만, 없으면 전체를 조회한다.
-	 */
+	// 1. 사진 게시글 전체 목록 조회
 	@Transactional(readOnly = true)
 	public PhotoListResponse getPhotoList(int page, int size, String category) {
 		int safePage = Math.max(page, 0);
 		int safeSize = size < 1 ? DEFAULT_SIZE : size;
 
 		Pageable pageable = PageRequest.of(safePage, safeSize,
-			Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")));
+			Sort.by(Sort.Direction.DESC, "eventDate").and(Sort.by(Sort.Direction.DESC, "id")));
 
 		Page<WelcomeKitPhoto> result = (category == null || category.isBlank())
 			? photoRepository.findAll(pageable)
@@ -68,7 +70,43 @@ public class WelcomeKitPhotoService {
 			.title(photo.getTitle())
 			.category(photo.getCategory())
 			.thumbnailUrl(thumbnailUrl)
-			.postedAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toLocalDate().toString() : null)
+			.eventDate(photo.getEventDate() != null ? photo.getEventDate().toString() : null)
+			.build();
+	}
+
+	// 2. 사진 게시글 작성 (운영진 전용)
+	@Transactional
+	public PhotoListResponse.PhotoSummary createPost(String requesterEmail, CreateWelcomeKitPhotoRequest request) {
+		User author = userService.getUserByEmail(requesterEmail);
+		if (author.getUserType() != UserType.ADMIN) {
+			throw new PhotoException(HttpStatus.FORBIDDEN, "E403", "운영진만 작성할 수 있습니다.");
+		}
+
+		WelcomeKitPhoto photo = WelcomeKitPhoto.builder()
+			.title(request.getTitle())
+			.content(request.getContent())
+			.category(request.getCategory())
+			.eventDate(request.getEventDate())
+			.author(author)
+			.build();
+
+		List<String> photoUrls = request.getPhotoUrls();
+		for (int i = 0; i < photoUrls.size(); i++) {
+			photo.getImages().add(WelcomeKitPhotoImage.builder()
+				.imageUrl(photoUrls.get(i))
+				.sortOrder(i)
+				.photo(photo)
+				.build());
+		}
+
+		WelcomeKitPhoto saved = photoRepository.save(photo);
+
+		return PhotoListResponse.PhotoSummary.builder()
+			.postId(saved.getId())
+			.title(saved.getTitle())
+			.category(saved.getCategory())
+			.thumbnailUrl(photoUrls.get(0))
+			.eventDate(saved.getEventDate().toString())
 			.build();
 	}
 }
