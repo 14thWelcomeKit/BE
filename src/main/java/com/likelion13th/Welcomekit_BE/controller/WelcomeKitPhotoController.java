@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.likelion13th.Welcomekit_BE.domain.dto.ApiResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateWelcomeKitPhotoRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.GenerateUploadUrlRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoListResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.UploadUrlResponse;
 import com.likelion13th.Welcomekit_BE.exception.PhotoException;
 import com.likelion13th.Welcomekit_BE.service.WelcomeKitPhotoService;
 
@@ -77,6 +79,22 @@ public class WelcomeKitPhotoController {
 			.body(ApiResponse.success("S201", "게시글이 등록되었습니다", data));
 	}
 
+	@Operation(
+		summary = "사진첩 이미지 업로드 URL 발급",
+		description = "운영진만 요청 가능합니다. 한 번에 최대 5개까지 S3 presigned PUT URL을 발급합니다 (유효시간 5분). "
+			+ "발급받은 uploadUrl로 프론트가 S3에 직접 PUT하고, fileUrl을 게시글 작성 API(POST /photos)의 photoUrls 에 사용합니다. "
+			+ "허용 형식은 jpeg/png/webp 이며, HEIC 등은 프론트에서 변환 후 요청해야 합니다.",
+		security = @SecurityRequirement(name = "Bearer Authentication")
+	)
+	@PostMapping("/upload-url")
+	public ApiResponse<UploadUrlResponse> generateUploadUrls(
+		@AuthenticationPrincipal UserDetails userDetails,
+		@Valid @RequestBody GenerateUploadUrlRequest request
+	) {
+		UploadUrlResponse data = photoService.generateUploadUrls(userDetails.getUsername(), request);
+		return ApiResponse.success("S200", "업로드 URL 발급에 성공했습니다", data);
+	}
+
 	/** DTO 필드 검증 실패: message 에 담긴 "코드:메시지" 를 그대로 응답 code/message 로 사용한다. */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
@@ -96,9 +114,14 @@ public class WelcomeKitPhotoController {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponse<Object>> handlePhotoError(Exception ex, HttpServletRequest request) {
 		log.error("[사진첩] 처리 실패", ex);
-		String message = "GET".equalsIgnoreCase(request.getMethod())
-			? "사진첩 목록 조회 중 오류가 발생했습니다"
-			: "게시글 등록 중 오류가 발생했습니다";
+		String message;
+		if (request.getRequestURI().endsWith("/upload-url")) {
+			message = "업로드 URL 발급 중 오류가 발생했습니다";
+		} else if ("GET".equalsIgnoreCase(request.getMethod())) {
+			message = "사진첩 목록 조회 중 오류가 발생했습니다";
+		} else {
+			message = "게시글 등록 중 오류가 발생했습니다";
+		}
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 			.body(ApiResponse.error("E500", message));
 	}
