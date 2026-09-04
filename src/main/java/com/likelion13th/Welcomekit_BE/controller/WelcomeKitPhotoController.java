@@ -2,19 +2,30 @@ package com.likelion13th.Welcomekit_BE.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.likelion13th.Welcomekit_BE.domain.dto.ApiResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateWelcomeKitPhotoRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoListResponse;
+import com.likelion13th.Welcomekit_BE.exception.PhotoException;
 import com.likelion13th.Welcomekit_BE.service.WelcomeKitPhotoService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,11 +61,45 @@ public class WelcomeKitPhotoController {
 		return ApiResponse.success("S200", "사진첩 목록 조회에 성공했습니다", data);
 	}
 
-	/** 사진첩 조회 중 예상치 못한 오류: 명세상 500 / E500 형태로 응답한다. */
+	@Operation(
+		summary = "사진첩 게시글 작성",
+		description = "운영진만 작성 가능합니다. 사진 1~5장, 제목 최대 30자, 내용 최대 1000자, "
+			+ "첫 번째 사진이 썸네일로 지정됩니다.",
+		security = @SecurityRequirement(name = "Bearer Authentication")
+	)
+	@PostMapping
+	public ResponseEntity<ApiResponse<PhotoListResponse.PhotoSummary>> createPost(
+		@AuthenticationPrincipal UserDetails userDetails,
+		@Valid @RequestBody CreateWelcomeKitPhotoRequest request
+	) {
+		PhotoListResponse.PhotoSummary data = photoService.createPost(userDetails.getUsername(), request);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(ApiResponse.success("S201", "게시글이 등록되었습니다", data));
+	}
+
+	/** DTO 필드 검증 실패: message 에 담긴 "코드:메시지" 를 그대로 응답 code/message 로 사용한다. */
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
+		FieldError fieldError = ex.getBindingResult().getFieldErrors().get(0);
+		String[] parts = fieldError.getDefaultMessage().split(":", 2);
+		return ResponseEntity.badRequest().body(ApiResponse.error(parts[0], parts[1]));
+	}
+
+	/** 운영진 권한 등 DTO 검증만으로 표현 못 하는 비즈니스 규칙 위반. */
+	@ExceptionHandler(PhotoException.class)
+	public ResponseEntity<ApiResponse<Object>> handlePhotoException(PhotoException ex) {
+		return ResponseEntity.status(ex.getHttpStatus())
+			.body(ApiResponse.error(ex.getCode(), ex.getMessage()));
+	}
+
+	/** 사진첩 처리 중 예상치 못한 오류: 명세상 500 / E500 형태로 응답한다 (엔드포인트별 메시지는 스펙 문구 그대로). */
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ApiResponse<Object>> handlePhotoError(Exception ex) {
-		log.error("[사진첩] 목록 조회 실패", ex);
+	public ResponseEntity<ApiResponse<Object>> handlePhotoError(Exception ex, HttpServletRequest request) {
+		log.error("[사진첩] 처리 실패", ex);
+		String message = "GET".equalsIgnoreCase(request.getMethod())
+			? "사진첩 목록 조회 중 오류가 발생했습니다"
+			: "게시글 등록 중 오류가 발생했습니다";
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			.body(ApiResponse.error("E500", "사진첩 목록 조회 중 오류가 발생했습니다"));
+			.body(ApiResponse.error("E500", message));
 	}
 }
