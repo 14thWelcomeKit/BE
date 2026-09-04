@@ -37,8 +37,8 @@ public class PhotoListResponse {
 		@Schema(description = "썸네일(첫 번째 사진) URL. 사진이 없으면 null", example = "https://.../thumb.jpg")
 		private final String thumbnailUrl;
 
-		@Schema(description = "게시일 (YYYY-MM-DD)", example = "2026-08-20")
-		private final String postedAt;
+		@Schema(description = "행사일 (YYYY-MM-DD)", example = "2026-08-20")
+		private final String eventDate;
 	}
 
 	@Getter
