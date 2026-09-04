@@ -29,6 +29,10 @@ public class PhotoDetailResponse {
 	@Schema(description = "사진 URL 전체 목록 (업로드 순서)")
 	private final List<String> photoUrls;
 
+	@Schema(description = "사진 ID 전체 목록. photoUrls 와 순서가 1:1 대응하며, "
+		+ "게시글 수정 API(PATCH /photos/{postId})의 deletePhotoIds 에 사용")
+	private final List<Long> photoIds;
+
 	@Schema(description = "내용", example = "1박 2일 즐거웠던 순간들")
 	private final String content;
 
