@@ -30,11 +30,15 @@ import com.likelion13th.Welcomekit_BE.exception.PhotoException;
 import com.likelion13th.Welcomekit_BE.repository.WelcomeKitPhotoRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WelcomeKitPhotoService {
@@ -50,6 +54,7 @@ public class WelcomeKitPhotoService {
 	private final WelcomeKitPhotoRepository photoRepository;
 	private final UserService userService;
 	private final S3Presigner s3Presigner;
+	private final S3Client s3Client;
 
 	@Value("${aws.s3.bucket}")
 	private String bucket;
@@ -241,7 +246,45 @@ public class WelcomeKitPhotoService {
 			.build();
 	}
 
-	// 5. 이미지 업로드용 presigned URL 발급 (운영진 전용)
+	// 5. 사진첩 게시글 삭제 (작성자 본인 전용)
+	@Transactional
+	public void deletePost(Long postId, String requesterEmail) {
+		WelcomeKitPhoto photo = photoRepository.findById(postId)
+			.orElseThrow(() -> new PhotoException(HttpStatus.NOT_FOUND, "E404", "존재하지 않는 게시글입니다."));
+
+		User author = photo.getAuthor();
+		if (author == null || !requesterEmail.equals(author.getEmail())) {
+			throw new PhotoException(HttpStatus.FORBIDDEN, "E403", "작성자만 삭제할 수 있습니다.");
+		}
+
+		List<String> imageUrls = photo.getImages().stream().map(WelcomeKitPhotoImage::getImageUrl).toList();
+
+		// DB 삭제가 우선/필수. cascade=ALL 이라 사진 레코드도 함께 지워진다.
+		photoRepository.delete(photo);
+
+		// S3 실제 파일 삭제는 best-effort: 실패해도 게시글 삭제 자체는 이미 끝난 것으로 처리한다.
+		imageUrls.forEach(this::deleteFromS3BestEffort);
+	}
+
+	private void deleteFromS3BestEffort(String imageUrl) {
+		String key = extractS3Key(imageUrl);
+		if (key == null) {
+			log.warn("[사진첩] S3 키를 추출할 수 없어 삭제를 건너뜀: {}", imageUrl);
+			return;
+		}
+		try {
+			s3Client.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+		} catch (Exception e) {
+			log.warn("[사진첩] S3 파일 삭제 실패 (게시글 삭제는 계속 진행): key={}", key, e);
+		}
+	}
+
+	private String extractS3Key(String imageUrl) {
+		String prefix = "https://%s.s3.%s.amazonaws.com/".formatted(bucket, region);
+		return (imageUrl != null && imageUrl.startsWith(prefix)) ? imageUrl.substring(prefix.length()) : null;
+	}
+
+	// 6. 이미지 업로드용 presigned URL 발급 (운영진 전용)
 	@Transactional(readOnly = true)
 	public UploadUrlResponse generateUploadUrls(String requesterEmail, GenerateUploadUrlRequest request) {
 		User requester = userService.getUserByEmail(requesterEmail);
