@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.likelion13th.Welcomekit_BE.domain.dto.ApiResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateWelcomeKitPhotoRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.GenerateUploadUrlRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.UpdateWelcomeKitPhotoRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoDetailResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoListResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.UpdatePhotoResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.UploadUrlResponse;
 import com.likelion13th.Welcomekit_BE.exception.PhotoException;
 import com.likelion13th.Welcomekit_BE.service.WelcomeKitPhotoService;
@@ -113,6 +116,24 @@ public class WelcomeKitPhotoController {
 		return ApiResponse.success("S200", "업로드 URL 발급에 성공했습니다", data);
 	}
 
+	@Operation(
+		summary = "사진첩 게시글 수정",
+		description = "작성자 본인만 수정 가능합니다. title/category/eventDate/content/addPhotoUrls/deletePhotoIds "
+			+ "전부 선택이며, 보낸 필드만 반영됩니다. 사진 추가/삭제 반영 후 개수는 1~5장을 유지해야 합니다. "
+			+ "deletePhotoIds 는 상세 조회 응답의 photoIds 값을 사용하세요.",
+		security = @SecurityRequirement(name = "Bearer Authentication")
+	)
+	@PatchMapping("/{postId}")
+	public ApiResponse<UpdatePhotoResponse> updatePost(
+		@Parameter(description = "수정할 게시글 ID", example = "5")
+		@PathVariable Long postId,
+		@AuthenticationPrincipal UserDetails userDetails,
+		@Valid @RequestBody UpdateWelcomeKitPhotoRequest request
+	) {
+		UpdatePhotoResponse data = photoService.updatePost(postId, userDetails.getUsername(), request);
+		return ApiResponse.success("S200", "게시글이 수정되었습니다", data);
+	}
+
 	/** DTO 필드 검증 실패: message 에 담긴 "코드:메시지" 를 그대로 응답 code/message 로 사용한다. */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
@@ -134,9 +155,12 @@ public class WelcomeKitPhotoController {
 		log.error("[사진첩] 처리 실패", ex);
 		String uri = request.getRequestURI();
 		String message;
+		String method = request.getMethod();
 		if (uri.endsWith("/upload-url")) {
 			message = "업로드 URL 발급 중 오류가 발생했습니다";
-		} else if (!"GET".equalsIgnoreCase(request.getMethod())) {
+		} else if ("PATCH".equalsIgnoreCase(method)) {
+			message = "게시글 수정 중 오류가 발생했습니다";
+		} else if (!"GET".equalsIgnoreCase(method)) {
 			message = "게시글 등록 중 오류가 발생했습니다";
 		} else if (uri.matches(".*/photos/[^/]+$")) {
 			message = "게시글 조회 중 오류가 발생했습니다";
