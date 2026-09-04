@@ -48,6 +48,9 @@ public class WelcomeKitPhoto {
 	@Column(columnDefinition = "TEXT")
 	private String content;
 
+	@Column(nullable = false)
+	private String category;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "author_id")
 	private User author;

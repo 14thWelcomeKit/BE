@@ -34,16 +34,19 @@ public class WelcomeKitPhotoController {
 	@Operation(
 		summary = "사진첩 목록 조회",
 		description = "기수별 사진첩 게시글을 게시일 기준 내림차순으로 페이지네이션 조회합니다. "
-			+ "각 게시글은 제목, 썸네일(첫 번째 사진), 게시일(YYYY-MM-DD)을 포함합니다."
+			+ "category 로 특정 기수만 필터링할 수 있으며, 미입력 시 전체 기수를 조회합니다. "
+			+ "각 게시글은 제목, 기수 카테고리, 썸네일(첫 번째 사진), 게시일(YYYY-MM-DD)을 포함합니다."
 	)
 	@GetMapping
 	public ApiResponse<PhotoListResponse> getPhotos(
 		@Parameter(description = "페이지 번호 (0-based, 선택, 기본값 0)", example = "0")
 		@RequestParam(defaultValue = "0") int page,
 		@Parameter(description = "페이지당 개수 (선택, 기본값 12)", example = "12")
-		@RequestParam(defaultValue = "12") int size
+		@RequestParam(defaultValue = "12") int size,
+		@Parameter(description = "기수 카테고리 필터 (선택, 미입력 시 전체)", example = "14기")
+		@RequestParam(required = false) String category
 	) {
-		PhotoListResponse data = photoService.getPhotoList(page, size);
+		PhotoListResponse data = photoService.getPhotoList(page, size, category);
 		return ApiResponse.success("S200", "사진첩 목록 조회에 성공했습니다", data);
 	}
 

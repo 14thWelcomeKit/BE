@@ -28,16 +28,19 @@ public class WelcomeKitPhotoService {
 	/**
 	 * 사진첩 게시글을 게시일(createdAt) 내림차순으로 페이지네이션 조회한다.
 	 * page 는 0-based, 잘못된 값은 안전한 기본값으로 보정한다.
+	 * category 가 주어지면 해당 기수 게시글만, 없으면 전체를 조회한다.
 	 */
 	@Transactional(readOnly = true)
-	public PhotoListResponse getPhotoList(int page, int size) {
+	public PhotoListResponse getPhotoList(int page, int size, String category) {
 		int safePage = Math.max(page, 0);
 		int safeSize = size < 1 ? DEFAULT_SIZE : size;
 
 		Pageable pageable = PageRequest.of(safePage, safeSize,
 			Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")));
 
-		Page<WelcomeKitPhoto> result = photoRepository.findAll(pageable);
+		Page<WelcomeKitPhoto> result = (category == null || category.isBlank())
+			? photoRepository.findAll(pageable)
+			: photoRepository.findByCategory(category, pageable);
 
 		List<PhotoListResponse.PhotoSummary> posts = result.getContent().stream()
 			.map(this::toSummary)
@@ -63,6 +66,7 @@ public class WelcomeKitPhotoService {
 		return PhotoListResponse.PhotoSummary.builder()
 			.postId(photo.getId())
 			.title(photo.getTitle())
+			.category(photo.getCategory())
 			.thumbnailUrl(thumbnailUrl)
 			.postedAt(photo.getCreatedAt() != null ? photo.getCreatedAt().toLocalDate().toString() : null)
 			.build();
