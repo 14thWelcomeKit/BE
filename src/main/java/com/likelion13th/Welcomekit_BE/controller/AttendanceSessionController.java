@@ -3,6 +3,9 @@ package com.likelion13th.Welcomekit_BE.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -75,18 +78,31 @@ public class AttendanceSessionController {
 	}
 
 	@Operation(
-		summary = "내 출석 내역 조회",
-		description = "로그인한 사용자의 전체 출석 세션별 출석 상태 목록을 반환합니다. **로그인 필요.**")
+		summary = "내 출석 내역 조회 (세션 날짜 최신순, 페이지네이션)",
+		description = """
+			로그인한 사용자의 출석 내역을 세션 날짜 **최신순**으로 반환합니다. **로그인 필요.**
+
+			- 페이지네이션 지원: `page`(0부터), `size`(기본 20)
+			- 응답은 Spring `Page` 형식(content, totalElements, totalPages, number, size 등)
+			""")
 	@GetMapping("/my-attendance")
 	public ResponseEntity<?> getMyAttendance(
-		@AuthenticationPrincipal UserDetails userDetails) {
-		List<MyAttendanceResponse> myAttendance = attendanceSessionManager.getMyAttendance(userDetails.getUsername());
+		@AuthenticationPrincipal UserDetails userDetails,
+		@PageableDefault(size = 20) Pageable pageable) {
+		Page<MyAttendanceResponse> myAttendance =
+			attendanceSessionManager.getMyAttendance(userDetails.getUsername(), pageable);
 		return ResponseEntity.ok(myAttendance);
 	}
 
 	@Operation(
-		summary = "오늘 내 출석 상태 조회",
-		description = "로그인한 사용자의 오늘 세션 출석 상태를 반환합니다. **로그인 필요.**")
+		summary = "오늘 출석 현황 조회 (전체 명단)",
+		description = """
+			오늘의 가장 최근 출석 세션 1개에 대한 전체 출석 현황(사람별)을 반환합니다. **로그인 필요.**
+
+			- 오늘 세션이 여러 개여도 최신 세션 1개의 명단만 반환합니다.
+			- 팀 미배정자도 포함되며 `teamName`은 null로 내려갑니다.
+			- 오늘 세션이 없으면 `SESSION_NOT_FOUND`(404).
+			""")
 	@GetMapping("/today/attendance")
 	public ResponseEntity<?> getTodayAttendance(@AuthenticationPrincipal UserDetails userDetails) {
 		return ResponseEntity.ok(attendanceSessionManager.getTodayAttendance(userDetails.getUsername()));

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.likelion13th.Welcomekit_BE.domain.AttendanceSession;
@@ -49,9 +51,9 @@ public class AttendanceSessionManager {
 		return attendanceSessionService.markAttendance(user, token);
 	}
 
-	public List<MyAttendanceResponse> getMyAttendance(String email) {
+	public Page<MyAttendanceResponse> getMyAttendance(String email, Pageable pageable) {
 		User user = userService.getUserByEmail(email);
-		return attendanceSessionService.getMyAttendance(user);
+		return attendanceSessionService.getMyAttendance(user, pageable);
 	}
 
 	public List<GetTodayAttendanceResponse> getTodayAttendance(String email) {
