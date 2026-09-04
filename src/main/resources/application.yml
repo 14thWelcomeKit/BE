@@ -1,10 +1,12 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]   # 프로젝트 루트 .env 를 설정으로 로드 (값은 팀에서 Notion 공유)
   application:
     name: Welcomekit_BE
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/welcomekit
+    url: jdbc:mysql://127.0.0.1:${MYSQL_PORT:3306}/welcomekit
     username: root
-    password: CHANGE_ME
+    password: ${MYSQL_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     properties:
@@ -16,7 +18,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME:}
+    username: ${MAIL_USERNAME:}               # 이메일 인증 테스트 안 하면 비워도 앱은 뜸
     password: ${MAIL_PASSWORD:}
     properties:
       mail:
@@ -26,7 +28,7 @@ spring:
             enable: true
 
 jwt:
-  secret: CHANGE_ME
+  secret: ${JWT_SECRET}
   expiration: 604800000
 
 app:
@@ -35,7 +37,7 @@ app:
     admin-invite-code: ${ADMIN_INVITE_CODE:}
     code-ttl-minutes: ${SIGNUP_CODE_TTL_MINUTES:10}
   attendance:
-    qr-base-url: ${ATTENDANCE_QR_BASE_URL:https://welcomekitbe.lion.it.kr/api/v3/welcome-kit/attendance/success}
+    qr-base-url: ${ATTENDANCE_QR_BASE_URL:http://localhost:8080/api/v3/welcome-kit/attendance/success}
 
 logging.level:
   org.hibernate.SQL: debug

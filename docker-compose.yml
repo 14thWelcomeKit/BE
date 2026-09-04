@@ -2,8 +2,10 @@ services:
   mysql:
     image: mysql:8
     container_name: welcomekit-mysql
-    network_mode: host
     restart: unless-stopped
+    # 포트가 이미 쓰이면 .env 의 MYSQL_PORT 로 변경 (기본 3306)
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: welcomekit
