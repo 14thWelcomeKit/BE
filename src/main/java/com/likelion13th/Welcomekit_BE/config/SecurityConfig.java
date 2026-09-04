@@ -55,6 +55,8 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/auth/reset-password/send-code").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/auth/reset-password").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/v3/welcome-kit/user/join").permitAll()
+				// 사진첩 목록 조회는 비로그인 허용
+				.requestMatchers(HttpMethod.GET, "/api/v3/welcome-kit/photos").permitAll()
 				// Swagger 문서
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/swagger",
 					"/swagger-resources/**", "/webjars/**").permitAll()
