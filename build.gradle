@@ -44,6 +44,10 @@ dependencies {
 	// QR code
 	implementation 'com.google.zxing:core:3.5.3'
 	implementation 'com.google.zxing:javase:3.5.3'
+
+	// AWS S3 (사진첩 이미지 업로드용 presigned URL)
+	implementation platform('software.amazon.awssdk:bom:2.28.11')
+	implementation 'software.amazon.awssdk:s3'
 }
 
 tasks.named('test') {
