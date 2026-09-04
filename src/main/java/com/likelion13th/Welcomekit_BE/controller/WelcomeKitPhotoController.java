@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.likelion13th.Welcomekit_BE.domain.dto.ApiResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateWelcomeKitPhotoRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.GenerateUploadUrlRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoDetailResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoListResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.UploadUrlResponse;
 import com.likelion13th.Welcomekit_BE.exception.PhotoException;
@@ -61,6 +63,22 @@ public class WelcomeKitPhotoController {
 	) {
 		PhotoListResponse data = photoService.getPhotoList(page, size, category);
 		return ApiResponse.success("S200", "사진첩 목록 조회에 성공했습니다", data);
+	}
+
+	@Operation(
+		summary = "사진첩 게시글 상세 조회",
+		description = "게시글 하나의 제목/전체 사진 목록/내용/행사일/작성자 정보를 조회합니다. 비로그인도 조회 가능하며, "
+			+ "로그인 상태에서 본인이 작성한 글이면 isOwner 가 true 로 내려갑니다 (수정/삭제 버튼 노출용)."
+	)
+	@GetMapping("/{postId}")
+	public ApiResponse<PhotoDetailResponse> getPhotoDetail(
+		@Parameter(description = "조회할 게시글 ID", example = "5")
+		@PathVariable Long postId,
+		@AuthenticationPrincipal(errorOnInvalidType = false) UserDetails userDetails
+	) {
+		String requesterEmail = userDetails != null ? userDetails.getUsername() : null;
+		PhotoDetailResponse data = photoService.getPhotoDetail(postId, requesterEmail);
+		return ApiResponse.success("S200", "게시글 조회에 성공했습니다", data);
 	}
 
 	@Operation(
@@ -114,13 +132,16 @@ public class WelcomeKitPhotoController {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponse<Object>> handlePhotoError(Exception ex, HttpServletRequest request) {
 		log.error("[사진첩] 처리 실패", ex);
+		String uri = request.getRequestURI();
 		String message;
-		if (request.getRequestURI().endsWith("/upload-url")) {
+		if (uri.endsWith("/upload-url")) {
 			message = "업로드 URL 발급 중 오류가 발생했습니다";
-		} else if ("GET".equalsIgnoreCase(request.getMethod())) {
-			message = "사진첩 목록 조회 중 오류가 발생했습니다";
-		} else {
+		} else if (!"GET".equalsIgnoreCase(request.getMethod())) {
 			message = "게시글 등록 중 오류가 발생했습니다";
+		} else if (uri.matches(".*/photos/[^/]+$")) {
+			message = "게시글 조회 중 오류가 발생했습니다";
+		} else {
+			message = "사진첩 목록 조회 중 오류가 발생했습니다";
 		}
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 			.body(ApiResponse.error("E500", message));

@@ -20,6 +20,7 @@ import com.likelion13th.Welcomekit_BE.domain.WelcomeKitPhoto;
 import com.likelion13th.Welcomekit_BE.domain.WelcomeKitPhotoImage;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateWelcomeKitPhotoRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.GenerateUploadUrlRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoDetailResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoListResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.UploadUrlResponse;
 import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
@@ -133,7 +134,34 @@ public class WelcomeKitPhotoService {
 			.build();
 	}
 
-	// 3. 이미지 업로드용 presigned URL 발급 (운영진 전용)
+	// 3. 사진첩 게시글 상세 조회 (비로그인 허용, requesterEmail 은 null 가능)
+	@Transactional(readOnly = true)
+	public PhotoDetailResponse getPhotoDetail(Long postId, String requesterEmail) {
+		WelcomeKitPhoto photo = photoRepository.findById(postId)
+			.orElseThrow(() -> new PhotoException(HttpStatus.NOT_FOUND, "E404", "존재하지 않는 게시글입니다."));
+
+		List<String> photoUrls = photo.getImages().stream()
+			.sorted(Comparator.comparingInt(WelcomeKitPhotoImage::getSortOrder))
+			.map(WelcomeKitPhotoImage::getImageUrl)
+			.toList();
+
+		User author = photo.getAuthor();
+		boolean isOwner = requesterEmail != null && author != null
+			&& requesterEmail.equals(author.getEmail());
+
+		return PhotoDetailResponse.builder()
+			.postId(photo.getId())
+			.title(photo.getTitle())
+			.category(photo.getCategory())
+			.photoUrls(photoUrls)
+			.content(photo.getContent())
+			.eventDate(photo.getEventDate() != null ? photo.getEventDate().toString() : null)
+			.authorNickname(author != null ? author.getUserName() : null)
+			.isOwner(isOwner)
+			.build();
+	}
+
+	// 4. 이미지 업로드용 presigned URL 발급 (운영진 전용)
 	@Transactional(readOnly = true)
 	public UploadUrlResponse generateUploadUrls(String requesterEmail, GenerateUploadUrlRequest request) {
 		User requester = userService.getUserByEmail(requesterEmail);
