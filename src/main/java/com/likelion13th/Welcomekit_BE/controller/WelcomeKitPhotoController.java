@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -134,6 +135,22 @@ public class WelcomeKitPhotoController {
 		return ApiResponse.success("S200", "게시글이 수정되었습니다", data);
 	}
 
+	@Operation(
+		summary = "사진첩 게시글 삭제",
+		description = "작성자 본인만 삭제 가능합니다. 게시글과 사진 레코드를 삭제하고, 업로드됐던 S3 파일도 함께 "
+			+ "삭제를 시도합니다 (S3 삭제 실패는 게시글 삭제 자체를 막지 않습니다).",
+		security = @SecurityRequirement(name = "Bearer Authentication")
+	)
+	@DeleteMapping("/{postId}")
+	public ApiResponse<Void> deletePost(
+		@Parameter(description = "삭제할 게시글 ID", example = "5")
+		@PathVariable Long postId,
+		@AuthenticationPrincipal UserDetails userDetails
+	) {
+		photoService.deletePost(postId, userDetails.getUsername());
+		return ApiResponse.success("S200", "게시글이 삭제되었습니다", null);
+	}
+
 	/** DTO 필드 검증 실패: message 에 담긴 "코드:메시지" 를 그대로 응답 code/message 로 사용한다. */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
@@ -160,6 +177,8 @@ public class WelcomeKitPhotoController {
 			message = "업로드 URL 발급 중 오류가 발생했습니다";
 		} else if ("PATCH".equalsIgnoreCase(method)) {
 			message = "게시글 수정 중 오류가 발생했습니다";
+		} else if ("DELETE".equalsIgnoreCase(method)) {
+			message = "게시글 삭제 중 오류가 발생했습니다";
 		} else if (!"GET".equalsIgnoreCase(method)) {
 			message = "게시글 등록 중 오류가 발생했습니다";
 		} else if (uri.matches(".*/photos/[^/]+$")) {
