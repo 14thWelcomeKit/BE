@@ -10,6 +10,8 @@ import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -166,15 +168,17 @@ public class AttendanceSessionService {
 		return user.getUserName() + "님, " + (status == AttendanceStatus.PRESENT ? "출석 완료" : "지각 처리되었습니다.");
 	}
 
-	public List<MyAttendanceResponse> getMyAttendance(User user) {
-		List<Attendance> myAttendances = attendanceRepository.findAllByUserOrderByAttendanceTime(user);
-		List<MyAttendanceResponse> list = myAttendances.stream().map(myAttendance -> {
-			MyAttendanceResponse myAttendanceResponse = new MyAttendanceResponse();
-			myAttendanceResponse.setAttendanceStatus(myAttendance.getStatus());
-			myAttendanceResponse.setDate(myAttendance.getAttendanceSession().getSessionDate().toLocalDate());
-			return myAttendanceResponse;
-		}).toList();
-		return list;
+	/**
+	 * 내 출석 내역 조회. 세션 날짜 최신순으로 정렬하며 페이지네이션을 지원한다.
+	 */
+	public Page<MyAttendanceResponse> getMyAttendance(User user, Pageable pageable) {
+		return attendanceRepository.findByUserOrderByAttendanceSession_SessionDateDesc(user, pageable)
+			.map(attendance -> {
+				MyAttendanceResponse response = new MyAttendanceResponse();
+				response.setAttendanceStatus(attendance.getStatus());
+				response.setDate(attendance.getAttendanceSession().getSessionDate().toLocalDate());
+				return response;
+			});
 	}
 
 	/**
@@ -185,7 +189,12 @@ public class AttendanceSessionService {
 	@Transactional
 	public List<GetTodayAttendanceResponse> getTodayAttendance(List<User> totalBabyLion) {
 		LocalDateTime startOfToday = LocalDateTime.now().toLocalDate().atStartOfDay();
-		AttendanceSession session = attendanceSessionRepository.findTopBySessionDateAfter(startOfToday)
+		LocalDateTime startOfTomorrow = startOfToday.plusDays(1);
+
+		// 오늘(0시~내일0시) 세션 중 가장 최근 세션 1개만 대표로 사용한다.
+		// (오늘 세션이 여러 개여도 여러 세션의 출석이 섞여 나오지 않도록 함)
+		AttendanceSession session = attendanceSessionRepository
+			.findTopBySessionDateBetweenOrderBySessionDateDesc(startOfToday, startOfTomorrow)
 			.orElseThrow(() -> {
 				log.error("오늘 출석 세션이 없습니다.");
 				return new CustomException(ErrorCode.SESSION_NOT_FOUND);
@@ -194,7 +203,13 @@ public class AttendanceSessionService {
 		// 세션에 출석 레코드가 없는 BABY_LION을 결석(ABSENT)으로 보정 저장
 		fillMissingAttendances(session, totalBabyLion);
 
-		return attendanceRepository.findTodayAttendance(startOfToday);
+		// 대표 세션의 출석만 반환. 팀 미배정자도 포함되도록 엔티티에서 매핑(팀 없으면 teamName=null).
+		return attendanceRepository.findAllByAttendanceSession(session).stream()
+			.map(a -> new GetTodayAttendanceResponse(
+				a.getUser().getTeam() != null ? a.getUser().getTeam().getTeamName() : null,
+				a.getUser().getUserName(),
+				a.getStatus()))
+			.toList();
 	}
 
 	/** 세션에 출석 레코드가 없는 BABY_LION에게 ABSENT 레코드를 생성해 저장한다. */
