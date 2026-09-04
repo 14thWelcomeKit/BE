@@ -55,8 +55,10 @@ public class AttendanceSessionManager {
 	}
 
 	public List<GetTodayAttendanceResponse> getTodayAttendance(String email) {
-		User user = userService.getUserByEmail(email);
-		return attendanceSessionService.getTodayAttendance(user);
+		// 로그인 사용자 확인(인증 목적). 조회는 오늘 세션의 전체 출석 현황을 반환한다.
+		userService.getUserByEmail(email);
+		List<User> totalBabyLion = userService.getTotalBabyLionUser();
+		return attendanceSessionService.getTodayAttendance(totalBabyLion);
 	}
 
 	// ══════════════════════════════════════════════════════════
@@ -70,7 +72,8 @@ public class AttendanceSessionManager {
 
 	public List<AttendanceDetailResponse> getSessionAttendances(String email, Long sessionId) {
 		requireAdmin(email);
-		return attendanceSessionService.getSessionAttendances(sessionId);
+		List<User> totalBabyLion = userService.getTotalBabyLionUser();
+		return attendanceSessionService.getSessionAttendances(sessionId, totalBabyLion);
 	}
 
 	public AttendanceDetailResponse updateAttendanceStatus(String email, Long attendanceId, AttendanceStatus status) {
