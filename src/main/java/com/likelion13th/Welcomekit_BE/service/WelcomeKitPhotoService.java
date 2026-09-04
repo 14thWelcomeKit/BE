@@ -20,8 +20,10 @@ import com.likelion13th.Welcomekit_BE.domain.WelcomeKitPhoto;
 import com.likelion13th.Welcomekit_BE.domain.WelcomeKitPhotoImage;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateWelcomeKitPhotoRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.GenerateUploadUrlRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.UpdateWelcomeKitPhotoRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoDetailResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoListResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.UpdatePhotoResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.UploadUrlResponse;
 import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
 import com.likelion13th.Welcomekit_BE.exception.PhotoException;
@@ -140,10 +142,11 @@ public class WelcomeKitPhotoService {
 		WelcomeKitPhoto photo = photoRepository.findById(postId)
 			.orElseThrow(() -> new PhotoException(HttpStatus.NOT_FOUND, "E404", "존재하지 않는 게시글입니다."));
 
-		List<String> photoUrls = photo.getImages().stream()
+		List<WelcomeKitPhotoImage> sortedImages = photo.getImages().stream()
 			.sorted(Comparator.comparingInt(WelcomeKitPhotoImage::getSortOrder))
-			.map(WelcomeKitPhotoImage::getImageUrl)
 			.toList();
+		List<String> photoUrls = sortedImages.stream().map(WelcomeKitPhotoImage::getImageUrl).toList();
+		List<Long> photoIds = sortedImages.stream().map(WelcomeKitPhotoImage::getId).toList();
 
 		User author = photo.getAuthor();
 		boolean isOwner = requesterEmail != null && author != null
@@ -154,6 +157,7 @@ public class WelcomeKitPhotoService {
 			.title(photo.getTitle())
 			.category(photo.getCategory())
 			.photoUrls(photoUrls)
+			.photoIds(photoIds)
 			.content(photo.getContent())
 			.eventDate(photo.getEventDate() != null ? photo.getEventDate().toString() : null)
 			.authorNickname(author != null ? author.getUserName() : null)
@@ -161,7 +165,83 @@ public class WelcomeKitPhotoService {
 			.build();
 	}
 
-	// 4. 이미지 업로드용 presigned URL 발급 (운영진 전용)
+	// 4. 사진첩 게시글 수정 (작성자 본인 전용)
+	@Transactional
+	public UpdatePhotoResponse updatePost(Long postId, String requesterEmail, UpdateWelcomeKitPhotoRequest request) {
+		WelcomeKitPhoto photo = photoRepository.findById(postId)
+			.orElseThrow(() -> new PhotoException(HttpStatus.NOT_FOUND, "E404", "존재하지 않는 게시글입니다."));
+
+		User author = photo.getAuthor();
+		if (author == null || !requesterEmail.equals(author.getEmail())) {
+			throw new PhotoException(HttpStatus.FORBIDDEN, "E403", "작성자만 수정할 수 있습니다.");
+		}
+
+		List<Long> deleteIds = request.getDeletePhotoIds();
+		List<String> addUrls = request.getAddPhotoUrls();
+
+		long deleteCount = deleteIds == null ? 0
+			: photo.getImages().stream().filter(image -> deleteIds.contains(image.getId())).count();
+		int addCount = addUrls == null ? 0 : addUrls.size();
+		long prospectiveCount = photo.getImages().size() - deleteCount + addCount;
+
+		if (prospectiveCount > 5) {
+			throw new PhotoException(HttpStatus.BAD_REQUEST, "E400_PHOTO", "사진은 최대 5장까지 업로드할 수 있습니다.");
+		}
+		if (prospectiveCount < 1) {
+			throw new PhotoException(HttpStatus.BAD_REQUEST, "E401_PHOTO_MIN", "사진은 최소 1장 이상 유지해야 합니다.");
+		}
+
+		if (deleteIds != null && !deleteIds.isEmpty()) {
+			// orphanRemoval=true 라 컬렉션에서 빼면 save 시 실제 행도 삭제된다.
+			photo.getImages().removeIf(image -> deleteIds.contains(image.getId()));
+		}
+
+		if (addUrls != null && !addUrls.isEmpty()) {
+			int nextSortOrder = photo.getImages().stream()
+				.mapToInt(WelcomeKitPhotoImage::getSortOrder)
+				.max()
+				.orElse(-1) + 1;
+			for (String url : addUrls) {
+				photo.getImages().add(WelcomeKitPhotoImage.builder()
+					.imageUrl(url)
+					.sortOrder(nextSortOrder++)
+					.photo(photo)
+					.build());
+			}
+		}
+
+		if (request.getTitle() != null) {
+			photo.setTitle(request.getTitle());
+		}
+		if (request.getCategory() != null) {
+			photo.setCategory(request.getCategory());
+		}
+		if (request.getEventDate() != null) {
+			photo.setEventDate(request.getEventDate());
+		}
+		if (request.getContent() != null) {
+			photo.setContent(request.getContent());
+		}
+
+		WelcomeKitPhoto saved = photoRepository.save(photo);
+
+		// 대표 사진(첫 번째, sortOrder 최소)이 지워졌다면 남은 사진 중 최소값이 자연히 새 썸네일이 된다.
+		List<String> photoUrls = saved.getImages().stream()
+			.sorted(Comparator.comparingInt(WelcomeKitPhotoImage::getSortOrder))
+			.map(WelcomeKitPhotoImage::getImageUrl)
+			.toList();
+
+		return UpdatePhotoResponse.builder()
+			.postId(saved.getId())
+			.title(saved.getTitle())
+			.category(saved.getCategory())
+			.eventDate(saved.getEventDate() != null ? saved.getEventDate().toString() : null)
+			.thumbnailUrl(photoUrls.isEmpty() ? null : photoUrls.get(0))
+			.photoUrls(photoUrls)
+			.build();
+	}
+
+	// 5. 이미지 업로드용 presigned URL 발급 (운영진 전용)
 	@Transactional(readOnly = true)
 	public UploadUrlResponse generateUploadUrls(String requesterEmail, GenerateUploadUrlRequest request) {
 		User requester = userService.getUserByEmail(requesterEmail);
