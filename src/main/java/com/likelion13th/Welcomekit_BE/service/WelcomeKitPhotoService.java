@@ -1,8 +1,12 @@
 package com.likelion13th.Welcomekit_BE.service;
 
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,21 +19,40 @@ import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.WelcomeKitPhoto;
 import com.likelion13th.Welcomekit_BE.domain.WelcomeKitPhotoImage;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateWelcomeKitPhotoRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.GenerateUploadUrlRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.PhotoListResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.UploadUrlResponse;
 import com.likelion13th.Welcomekit_BE.domain.enums.UserType;
 import com.likelion13th.Welcomekit_BE.exception.PhotoException;
 import com.likelion13th.Welcomekit_BE.repository.WelcomeKitPhotoRepository;
 
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 @Service
 @RequiredArgsConstructor
 public class WelcomeKitPhotoService {
 
 	private static final int DEFAULT_SIZE = 12;
+	private static final Duration UPLOAD_URL_EXPIRY = Duration.ofMinutes(5);
+	private static final Map<String, String> EXTENSION_BY_CONTENT_TYPE = Map.of(
+		"image/jpeg", "jpg",
+		"image/png", "png",
+		"image/webp", "webp"
+	);
 
 	private final WelcomeKitPhotoRepository photoRepository;
 	private final UserService userService;
+	private final S3Presigner s3Presigner;
+
+	@Value("${aws.s3.bucket}")
+	private String bucket;
+
+	@Value("${aws.s3.region}")
+	private String region;
 
 	// 1. 사진 게시글 전체 목록 조회
 	@Transactional(readOnly = true)
@@ -107,6 +130,45 @@ public class WelcomeKitPhotoService {
 			.category(saved.getCategory())
 			.thumbnailUrl(photoUrls.get(0))
 			.eventDate(saved.getEventDate().toString())
+			.build();
+	}
+
+	// 3. 이미지 업로드용 presigned URL 발급 (운영진 전용)
+	@Transactional(readOnly = true)
+	public UploadUrlResponse generateUploadUrls(String requesterEmail, GenerateUploadUrlRequest request) {
+		User requester = userService.getUserByEmail(requesterEmail);
+		if (requester.getUserType() != UserType.ADMIN) {
+			throw new PhotoException(HttpStatus.FORBIDDEN, "E403", "운영진만 업로드할 수 있습니다.");
+		}
+
+		List<UploadUrlResponse.UrlPair> urls = request.getFiles().stream()
+			.map(file -> generateUploadUrl(file.getContentType()))
+			.toList();
+
+		return UploadUrlResponse.builder().urls(urls).build();
+	}
+
+	private UploadUrlResponse.UrlPair generateUploadUrl(String contentType) {
+		String extension = EXTENSION_BY_CONTENT_TYPE.get(contentType);
+		String key = "photos/" + UUID.randomUUID() + "." + extension;
+
+		PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+			.bucket(bucket)
+			.key(key)
+			.contentType(contentType)
+			.build();
+
+		PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+			.signatureDuration(UPLOAD_URL_EXPIRY)
+			.putObjectRequest(putObjectRequest)
+			.build();
+
+		PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(presignRequest);
+		String fileUrl = "https://%s.s3.%s.amazonaws.com/%s".formatted(bucket, region, key);
+
+		return UploadUrlResponse.UrlPair.builder()
+			.uploadUrl(presigned.url().toString())
+			.fileUrl(fileUrl)
 			.build();
 	}
 }
