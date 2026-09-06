@@ -1,7 +1,5 @@
 package com.likelion13th.Welcomekit_BE.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +17,7 @@ public class QnaComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 1000, nullable = false)
     private String content;
 
     private LocalDateTime createdAt;
@@ -30,18 +28,11 @@ public class QnaComment {
 
     @ManyToOne
     @JoinColumn(name = "qna_id")
-    @JsonIgnore
     private Qna qna;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private User user;
-
-    @JsonProperty("userid")
-    public Long getUserid() {
-        return user != null ? user.getId() : null;
-    }
 
     @PrePersist
     public void prePersist() {

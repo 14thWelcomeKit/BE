@@ -1,12 +1,14 @@
 package com.likelion13th.Welcomekit_BE.manager;
 
 import com.likelion13th.Welcomekit_BE.domain.Qna;
+import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.repository.QnaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -19,13 +21,16 @@ public class QnaManager {
         return qnaRepository.save(qna);
     }
 
-    public List<Qna> findAll(){
-        return qnaRepository.findByDeletedAtIsNull();
+    public Page<Qna> findAll(Pageable pageable){
+        return qnaRepository.findByDeletedAtIsNullOrderByCreatedAtDesc(pageable);
+    }
+
+    public Page<Qna> findAllByUser(User user, Pageable pageable){
+        return qnaRepository.findByUserAndDeletedAtIsNullOrderByCreatedAtDesc(user, pageable);
     }
 
     public Optional<Qna> findById(Long id){
-        return qnaRepository.findById(id)
-                .filter(q -> q.getDeletedAt() == null);
+        return qnaRepository.findByIdAndDeletedAtIsNull(id);
     }
 
     public void delete(Qna qna){
