@@ -33,6 +33,10 @@ public class BingoCell {
 	@JoinColumn(name = "bingo_id", nullable = false)
 	private Bingo bingo;
 
+	/** 보드 상의 위치 (1~25). 응답의 cellId 로 그대로 사용된다. */
+	@Column(name = "position", nullable = false)
+	private Integer position;
+
 	@Enumerated(EnumType.STRING)
 	@Column(name = "mission", nullable = false)
 	private BingoEnum mission;
@@ -40,6 +44,8 @@ public class BingoCell {
 	@Column(name = "is_complete", nullable = false)
 	private Boolean isComplete;
 
-	@Column(name = "is_revealed", nullable = false)
-	private Boolean isRevealed;
+	/** 이 칸을 함께 완료한 상대방. 미완료 상태면 null. */
+	@ManyToOne
+	@JoinColumn(name = "matched_user_id")
+	private User matchedUser;
 }

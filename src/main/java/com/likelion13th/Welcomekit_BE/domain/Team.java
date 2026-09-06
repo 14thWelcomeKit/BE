@@ -20,9 +20,6 @@ public class Team {
 	@Column(name = "team_name", nullable = false, unique = true)
 	private String teamName;
 
-	@OneToOne(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Bingo bingo;
-
 	@OneToOne
 	@JoinColumn(name = "leader_id")
 	private User leader;
