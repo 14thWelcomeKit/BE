@@ -101,7 +101,7 @@ jobs:
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/welcomekit_be
             sudo docker rm -f welcomekit_be || true
             sudo docker run -v /home/ubuntu/profile:/app/external-profile \
-              --name welcomekit_be --rm -d --network host \
+              --name welcomekit_be --restart unless-stopped -d --network host \
               -e MYSQL_ROOT_PASSWORD="$MYSQL_ROOT_PASSWORD" \
               -e JWT_SECRET="$JWT_SECRET" \
               -e MAIL_USERNAME="$MAIL_USERNAME" \
