@@ -10,5 +10,7 @@ import com.likelion13th.Welcomekit_BE.domain.User;
 public interface BingoRepository extends JpaRepository<Bingo, Long> {
 	Optional<Bingo> findByUser(User user);
 
+	Optional<Bingo> findByCode(String code);
+
 	boolean existsByCode(String code);
 }
