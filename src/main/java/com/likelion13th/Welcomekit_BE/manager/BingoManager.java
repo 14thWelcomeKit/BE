@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.BingoBoardResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.BingoRankingResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.BingoVerifyResponse;
+import com.likelion13th.Welcomekit_BE.service.BingoRankingService;
 import com.likelion13th.Welcomekit_BE.service.BingoService;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
@@ -17,6 +19,8 @@ public class BingoManager {
 	@Autowired
 	private final BingoService bingoService;
 	@Autowired
+	private final BingoRankingService bingoRankingService;
+	@Autowired
 	private final UserService userService;
 
 	public BingoBoardResponse getBingoBoard(String email) {
@@ -27,5 +31,10 @@ public class BingoManager {
 	public BingoVerifyResponse verifyCell(String email, Integer cellId, String opponentCode) {
 		User user = userService.getUserByEmail(email);
 		return bingoService.verifyCell(user, cellId, opponentCode);
+	}
+
+	public BingoRankingResponse getRanking(String email) {
+		User user = userService.getUserByEmail(email);
+		return bingoRankingService.getRanking(user);
 	}
 }

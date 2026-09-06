@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.likelion13th.Welcomekit_BE.domain.dto.ApiResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.BingoVerifyRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.BingoVerifyResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.BingoRankingResponse;
 import com.likelion13th.Welcomekit_BE.exception.BingoException;
 import com.likelion13th.Welcomekit_BE.manager.BingoManager;
 
@@ -60,6 +61,14 @@ public class BingoController {
 		return ResponseEntity.ok(ApiResponse.success("S200", message, response));
 	}
 
+	@Operation(summary = "랭킹 조회", description = "완성 칸 점수 기준 상위 5명과 본인 순위를 조회합니다 (1일 1회 배치 갱신).",
+		security = @SecurityRequirement(name = "Bearer Authentication"))
+	@GetMapping("/ranking")
+	public ResponseEntity<?> getRanking(@AuthenticationPrincipal UserDetails userDetails) {
+		BingoRankingResponse response = bingoManager.getRanking(userDetails.getUsername());
+		return ResponseEntity.ok(ApiResponse.success("S200", "랭킹 조회에 성공했습니다", response));
+	}
+
 	/** 매칭 규칙 위반 등 DTO 검증만으로 표현 못 하는 빙고 비즈니스 규칙 위반. */
 	@ExceptionHandler(BingoException.class)
 	public ResponseEntity<ApiResponse<Object>> handleBingoException(BingoException ex) {
@@ -71,9 +80,15 @@ public class BingoController {
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponse<Object>> handleBingoError(Exception ex, HttpServletRequest request) {
 		log.error("[빙고] 처리 실패", ex);
-		String message = request.getRequestURI().endsWith("/verify")
-			? "인증 처리 중 오류가 발생했습니다."
-			: "빙고판 조회 중 오류가 발생했습니다";
+		String uri = request.getRequestURI();
+		String message;
+		if (uri.endsWith("/verify")) {
+			message = "인증 처리 중 오류가 발생했습니다.";
+		} else if (uri.endsWith("/ranking")) {
+			message = "랭킹 조회 중 오류가 발생했습니다";
+		} else {
+			message = "빙고판 조회 중 오류가 발생했습니다";
+		}
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 			.body(ApiResponse.error("E500", message));
 	}
