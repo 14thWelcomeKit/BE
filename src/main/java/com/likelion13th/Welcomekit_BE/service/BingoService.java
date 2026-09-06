@@ -88,6 +88,8 @@ public class BingoService {
 			throw new BingoException(HttpStatus.BAD_REQUEST, "E401_DUP", "이미 해당 사용자와 매칭을 완료했습니다.");
 		}
 
+		// 보드가 사용자마다 독립적으로 셔플되어 있어 cellId 숫자는 사람마다 다른 미션을 가리킬 수 있다.
+		// 그래서 칸 번호가 아니라 "같은 미션"을 상대도 나를 향해 등록해뒀는지로 매칭한다.
 		List<BingoCell> opponentCellsTargetingMe = bingoCellRepository
 			.findByBingoAndMatchedUser(opponentBingo, user);
 		opponentCellsTargetingMe.forEach(this::expireIfNeeded);
@@ -95,12 +97,12 @@ public class BingoService {
 			.filter(cell -> cell.getStatus() != BingoCellStatus.INCOMPLETE)
 			.toList();
 
-		Optional<BingoCell> sameCellFromOpponent = opponentCellsTargetingMe.stream()
-			.filter(cell -> cell.getPosition().equals(cellId))
+		Optional<BingoCell> sameMissionFromOpponent = opponentCellsTargetingMe.stream()
+			.filter(cell -> cell.getMission() == myCell.getMission())
 			.findFirst();
 
-		if (sameCellFromOpponent.isPresent()) {
-			BingoCell opponentCell = sameCellFromOpponent.get();
+		if (sameMissionFromOpponent.isPresent()) {
+			BingoCell opponentCell = sameMissionFromOpponent.get();
 
 			myCell.setStatus(BingoCellStatus.COMPLETED);
 			myCell.setMatchedUser(opponentUser);
