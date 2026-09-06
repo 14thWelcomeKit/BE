@@ -9,36 +9,43 @@ import lombok.Getter;
 
 @Getter
 public enum BingoEnum {
-	MISSION_1("인생네컷 찍어서 올리기"),
-	MISSION_2("회식사진 찍어서 올리기"),
-	MISSION_3("동방 모각코 / 오프라인 모각코"),
-	MISSION_4("에타 시간표 공유하기"),
-	MISSION_5("명수당 피크닉"),
-	MISSION_6("모여서 같이 시험공부"),
-	MISSION_7("같이 학식먹기 (오후 5시 이전)"),
-	MISSION_8("코노/오락실/보드게임 카페 가기! "),
-	MISSION_9("전원 개총/종총 참여"),
-	MISSION_10("서로의 TMI 공유하기"),
-	MISSION_11("팀원 생일 챙기기"),
-	MISSION_12("팀 단체사진 찍기"),
-	MISSION_13("같이 영화/드라마 보기"),
-	MISSION_14("같이 새벽까지 코딩하기"),
-	MISSION_15("서로의 개발환경 보여주기"),
-	MISSION_16("팀원과 같이 과제/공부 도와주기"),
-	MISSION_17("서로가 좋아하는 노래 공유하기"),
-	MISSION_18("랜덤 커피 챌린지"),
-	MISSION_19("학교 근처 맛집 탐방"),
-	MISSION_20("팀원과 함께 사진 찍어서 프사로 설정하기"),
-	MISSION_21("랜덤 팀원 인터뷰하기"),
-	MISSION_22("코딩 챌린지 or 문제 풀기 대결"),
-	MISSION_23("팀원과 같은 색깔 옷 입고 사진 찍기"),
-	MISSION_24("멋사 포즈 or 13 그려서 사진 찍기"),
-	MISSION_25("외대 뒷산 올라서 다같이 기념 사진 찍기");
+	// 1단계 - 가벼운 TMI (1점)
+	MISSION_1("나와 MBTI 맨 앞자리(E/I)가 반대인 사람", 1),
+	MISSION_2("오늘 나와 비슷한 색깔의 상의를 입은 사람", 1),
+	MISSION_3("탕수육 부먹/찍먹 취향이 나와 딱 맞는 사람", 1),
+	MISSION_4("민트초코를 내 돈 주고 사 먹는 사람 (또는 절대 안 먹는 사람)", 1),
+	MISSION_5("학교까지 통학 시간 왕복 2시간 이상인 '프로통학러'", 1),
+	MISSION_6("나와 출신 지역(또는 거주 동네)이 같은 사람", 1),
+	MISSION_7("이름에 나와 같은 글자가 하나라도 들어가는 사람", 1),
+	MISSION_8("나와 생일이 같은 달인 사람", 1),
+	MISSION_9("나와 같은 과목을 수강하는 사람", 1),
+
+	// 2단계 - 개발자 & 멋사 공감대 (2점)
+	MISSION_10("나와 다른 파트인 사람 (프론트/백)", 2),
+	MISSION_11("나와 다른 OS를 사용하는 사람 (맥북/윈도우)", 2),
+	MISSION_12("나와 같은 주력 언어를 사용하는 사람 (Java/Python/JavaScript 등)", 2),
+	MISSION_13("나와 같은 IDE를 사용하는 사람 (VS Code/IntelliJ 등)", 2),
+	MISSION_14("최근 한 달 내에 깃허브 잔디(커밋) 7일 연속 심어본 사람", 2),
+	MISSION_15("GitHub 프로필에 직접 작성한 Profile README가 있는 사람 (기본 빈 README 제외)", 2),
+	MISSION_16("본인 파트와 관련된 GitHub Repository가 10개 이상인 사람", 2),
+	MISSION_17("직접 배포 작업을 해본 사람", 2),
+
+	// 3단계 - 적극적인 친목 유도 (3점)
+	MISSION_18("운영진 중 한 명과 같이 셀카 찍기", 3),
+	MISSION_19("서로의 최애 학교 앞 밥집 1개씩 추천해주기", 3),
+	MISSION_20("다른 팀 부원과 다음 주 내로 밥약/커피챗 약속 잡기 (잡고 나서 코드 교환)", 3),
+	MISSION_21("동아리방(또는 모임 장소)에서 내 양옆 자리에 앉은 사람", 3),
+	MISSION_22("서로의 깃허브 맞팔(Follow) 하기", 3),
+	MISSION_23("서로의 인스타그램 맞팔(Follow) 하기", 3),
+	MISSION_24("운영진·아기사자 구분 없이 같은 연생인 사람과 사진 찍기", 3),
+	MISSION_25("같이 카공 하기", 3);
 
 	private final String description;
+	private final int points;
 
-	BingoEnum(String description) {
+	BingoEnum(String description, int points) {
 		this.description = description;
+		this.points = points;
 	}
 
 	public static List<BingoEnum> getRandomMissions(int count) {
