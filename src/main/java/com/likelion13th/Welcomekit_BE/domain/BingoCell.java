@@ -1,5 +1,8 @@
 package com.likelion13th.Welcomekit_BE.domain;
 
+import java.time.LocalDateTime;
+
+import com.likelion13th.Welcomekit_BE.domain.enums.BingoCellStatus;
 import com.likelion13th.Welcomekit_BE.domain.enums.BingoEnum;
 
 import jakarta.persistence.Column;
@@ -41,11 +44,16 @@ public class BingoCell {
 	@Column(name = "mission", nullable = false)
 	private BingoEnum mission;
 
-	@Column(name = "is_complete", nullable = false)
-	private Boolean isComplete;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
+	private BingoCellStatus status;
 
-	/** 이 칸을 함께 완료한 상대방. 미완료 상태면 null. */
+	/** PENDING 이면 인증을 기다리는 상대, COMPLETED 면 함께 매칭을 완료한 상대. */
 	@ManyToOne
 	@JoinColumn(name = "matched_user_id")
 	private User matchedUser;
+
+	/** PENDING 상태의 48시간 만료 시각. PENDING 이 아니면 null. */
+	@Column(name = "pending_expires_at")
+	private LocalDateTime pendingExpiresAt;
 }
