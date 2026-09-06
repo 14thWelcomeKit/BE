@@ -103,8 +103,13 @@ public class BingoRankingService {
 		log.info("[빙고 랭킹] {}명 스냅샷 갱신 완료 ({})", rankings.size(), batchTime);
 	}
 
-	/** 로컬/개발 환경에서 자정까지 기다리지 않고도 확인할 수 있도록, 앱 기동 시 한 번 계산해둔다. */
+	/**
+	 * 로컬/개발 환경에서 자정까지 기다리지 않고도 확인할 수 있도록, 앱 기동 시 한 번 계산해둔다.
+	 * refreshRankings() 는 같은 빈 내부에서 호출하면 프록시를 거치지 않아 @Transactional 이
+	 * 적용되지 않으므로(self-invocation), 이 메서드에도 별도로 @Transactional 을 붙인다.
+	 */
 	@EventListener(ApplicationReadyEvent.class)
+	@Transactional
 	public void refreshRankingsOnStartup() {
 		refreshRankings();
 	}
