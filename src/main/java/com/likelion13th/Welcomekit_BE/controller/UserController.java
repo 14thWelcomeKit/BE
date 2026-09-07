@@ -1,26 +1,25 @@
 package com.likelion13th.Welcomekit_BE.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.likelion13th.Welcomekit_BE.domain.dto.request.ChangePasswordRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.GenerateProfileImageUploadUrlRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.PromoteAdminRequest;
+import com.likelion13th.Welcomekit_BE.domain.dto.request.UpdateProfileImageRequest;
 import com.likelion13th.Welcomekit_BE.manager.UserManager;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -83,23 +82,22 @@ public class UserController {
 		return ResponseEntity.ok("password changed");
 	}
 
-	@Operation(summary = "프로필 이미지 업로드", description = "multipart로 프로필 이미지를 업로드합니다.")
-	@PostMapping(value = "/uploadProfile", consumes = "multipart/form-data")
-	ResponseEntity<?> uploadProfile(@AuthenticationPrincipal UserDetails userDetails,
-		@Parameter(name = "file", description = "업로드 사진 데이터")
-		@RequestParam(value = "file") MultipartFile file) {
-		userManager.saveProfileImage(file, userDetails);
-		return ResponseEntity.ok("저장 완료");
+	@Operation(summary = "프로필 이미지 업로드 URL 발급",
+		description = "S3 presigned PUT URL을 발급합니다. 이 URL로 이미지를 직접 S3에 업로드한 뒤, "
+			+ "응답의 fileUrl을 PATCH /user/profileImage 에 보내야 실제 프로필 이미지로 반영됩니다.",
+		security = @SecurityRequirement(name = "Bearer Authentication"))
+	@PostMapping("/profileImage/upload-url")
+	ResponseEntity<?> generateProfileImageUploadUrl(@AuthenticationPrincipal UserDetails userDetails,
+		@Valid @RequestBody GenerateProfileImageUploadUrlRequest request) {
+		return ResponseEntity.ok(userManager.generateProfileImageUploadUrl(request.getContentType()));
 	}
 
-	@Operation(summary = "프로필 이미지 조회", description = "multipart로 프로필 이미지를 조회합니다.")
-	@GetMapping("/profileImage")
-	public ResponseEntity<Resource> getProfileImage(@AuthenticationPrincipal UserDetails userDetails) {
-		Resource image = userManager.getProfileImage(userDetails);
-		String contentType = userManager.getProfileSource(image);
-
-		return ResponseEntity.ok()
-			.contentType(MediaType.parseMediaType(contentType))
-			.body(image);
+	@Operation(summary = "프로필 이미지 반영", description = "S3 업로드 완료 후 발급받은 fileUrl을 실제 프로필 이미지로 반영합니다.",
+		security = @SecurityRequirement(name = "Bearer Authentication"))
+	@PatchMapping("/profileImage")
+	ResponseEntity<?> updateProfileImage(@AuthenticationPrincipal UserDetails userDetails,
+		@Valid @RequestBody UpdateProfileImageRequest request) {
+		userManager.updateProfileImage(userDetails, request.getFileUrl());
+		return ResponseEntity.ok("저장 완료");
 	}
 }

@@ -3,15 +3,14 @@ package com.likelion13th.Welcomekit_BE.manager;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.likelion13th.Welcomekit_BE.domain.User;
 import com.likelion13th.Welcomekit_BE.domain.dto.request.CreateUserRequest;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetAllBabyLionResponse;
 import com.likelion13th.Welcomekit_BE.domain.dto.response.GetMyInfoResponse;
+import com.likelion13th.Welcomekit_BE.domain.dto.response.ProfileImageUploadUrlResponse;
 import com.likelion13th.Welcomekit_BE.repository.UserRepository;
 import com.likelion13th.Welcomekit_BE.service.UserService;
 
@@ -56,18 +55,13 @@ public class UserManager {
 		userService.changePassword(user, currentPassword, newPassword);
 	}
 
-	public void saveProfileImage(MultipartFile file, UserDetails userDetails) {
-		User user = userService.getUserByEmail(userDetails.getUsername());
-		userService.saveProfileImage(file, user);
+	public ProfileImageUploadUrlResponse generateProfileImageUploadUrl(String contentType) {
+		return userService.generateProfileImageUploadUrl(contentType);
 	}
 
-	public Resource getProfileImage(UserDetails userDetails) {
+	public void updateProfileImage(UserDetails userDetails, String fileUrl) {
 		User user = userService.getUserByEmail(userDetails.getUsername());
-		return userService.getProfileImage(user);
-	}
-
-	public String getProfileSource(Resource resource) {
-		return userService.getProfileImageContentType(resource);
+		userService.updateProfileImage(user, fileUrl);
 	}
 
 }
