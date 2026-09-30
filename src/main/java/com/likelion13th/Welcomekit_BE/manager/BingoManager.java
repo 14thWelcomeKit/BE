@@ -33,6 +33,11 @@ public class BingoManager {
 		return bingoService.verifyCell(user, cellId, opponentCode);
 	}
 
+	public BingoVerifyResponse cancelPending(String email, Integer cellId) {
+		User user = userService.getUserByEmail(email);
+		return bingoService.cancelPending(user, cellId);
+	}
+
 	public BingoRankingResponse getRanking(String email) {
 		User user = userService.getUserByEmail(email);
 		return bingoRankingService.getRanking(user);
