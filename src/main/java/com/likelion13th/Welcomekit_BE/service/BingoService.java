@@ -133,6 +133,28 @@ public class BingoService {
 		return new BingoVerifyResponse(cellId, BingoCellStatus.PENDING.name(), null, formattedExpiresAt);
 	}
 
+	@Transactional
+	public BingoVerifyResponse cancelPending(User user, Integer cellId) {
+		Bingo myBingo = bingoRepository.findByUser(user)
+			.orElseGet(() -> createBingoBoard(user));
+
+		BingoCell myCell = bingoCellRepository.findByBingoAndPositionWithPessimisticLock(myBingo, cellId)
+			.orElseThrow();
+		expireIfNeeded(myCell);
+
+		// 이미 매칭이 완료된 칸은 상대 칸·랭킹에도 반영되어 있어 되돌릴 수 없다.
+		if (myCell.getStatus() != BingoCellStatus.PENDING) {
+			throw new BingoException(HttpStatus.BAD_REQUEST, "E404_NOT_PENDING", "대기 중인 칸만 취소할 수 있어요.");
+		}
+
+		myCell.setStatus(BingoCellStatus.INCOMPLETE);
+		myCell.setMatchedUser(null);
+		myCell.setPendingExpiresAt(null);
+		bingoCellRepository.save(myCell);
+
+		return new BingoVerifyResponse(cellId, BingoCellStatus.INCOMPLETE.name(), null, null);
+	}
+
 	private void expireIfNeeded(BingoCell cell) {
 		if (cell.getStatus() == BingoCellStatus.PENDING
 			&& cell.getPendingExpiresAt() != null
