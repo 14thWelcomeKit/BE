@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,6 +60,16 @@ public class BingoController {
 			? "매칭이 완료되었습니다"
 			: "상대방의 인증을 기다리고 있어요";
 		return ResponseEntity.ok(ApiResponse.success("S200", message, response));
+	}
+
+	@Operation(summary = "미션 인증 취소(PENDING 되돌리기)",
+		description = "상대방 인증을 기다리는 칸(PENDING)을 미완료 상태로 되돌립니다. 코드를 잘못 입력했을 때 사용하며, 완료된 칸은 취소할 수 없습니다.",
+		security = @SecurityRequirement(name = "Bearer Authentication"))
+	@DeleteMapping("/cells/{cellId}/verify")
+	public ResponseEntity<?> cancelPending(@AuthenticationPrincipal UserDetails userDetails,
+		@PathVariable Integer cellId) {
+		BingoVerifyResponse response = bingoManager.cancelPending(userDetails.getUsername(), cellId);
+		return ResponseEntity.ok(ApiResponse.success("S200", "인증 요청이 취소되었습니다", response));
 	}
 
 	@Operation(summary = "랭킹 조회", description = "완성 칸 점수 기준 상위 5명과 본인 순위를 조회합니다 (1일 1회 배치 갱신).",
