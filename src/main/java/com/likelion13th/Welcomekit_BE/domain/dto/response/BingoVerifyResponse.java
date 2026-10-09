@@ -9,5 +9,6 @@ public class BingoVerifyResponse {
 	private Integer cellId;
 	private String status;
 	private String matchedWithName;
+	private String matchedWithCode;
 	private String expiresAt;
 }

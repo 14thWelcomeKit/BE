@@ -7,7 +7,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,10 +54,21 @@ public class BingoService {
 		Bingo bingo = bingoRepository.findByUser(user)
 			.orElseGet(() -> createBingoBoard(user));
 
+		bingo.getCells().forEach(this::expireIfNeeded);
+
+		// 상대 코드는 User 가 아닌 Bingo 에 있어, 칸마다 조회하지 않도록 상대들의 빙고를 한 번에 가져온다.
+		Set<User> matchedUsers = bingo.getCells().stream()
+			.map(BingoCell::getMatchedUser)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toSet());
+		Map<Long, String> codeByUserId = matchedUsers.isEmpty()
+			? Map.of()
+			: bingoRepository.findByUserIn(matchedUsers).stream()
+				.collect(Collectors.toMap(b -> b.getUser().getId(), Bingo::getCode));
+
 		List<BingoCellResponse> cells = bingo.getCells().stream()
-			.peek(this::expireIfNeeded)
 			.sorted(Comparator.comparingInt(BingoCell::getPosition))
-			.map(this::toCellResponse)
+			.map(cell -> toCellResponse(cell, codeByUserId))
 			.toList();
 
 		return new BingoBoardResponse(bingo.getCode(), cells);
@@ -115,7 +130,8 @@ public class BingoService {
 			bingoCellRepository.save(myCell);
 			bingoCellRepository.save(opponentCell);
 
-			return new BingoVerifyResponse(cellId, BingoCellStatus.COMPLETED.name(), opponentUser.getUserName(), null);
+			return new BingoVerifyResponse(cellId, BingoCellStatus.COMPLETED.name(), opponentUser.getUserName(),
+				opponentCode, null);
 		}
 
 		if (!opponentCellsTargetingMe.isEmpty()) {
@@ -130,7 +146,8 @@ public class BingoService {
 		bingoCellRepository.save(myCell);
 
 		String formattedExpiresAt = expiresAt.atZone(KST).format(EXPIRES_AT_FORMATTER);
-		return new BingoVerifyResponse(cellId, BingoCellStatus.PENDING.name(), null, formattedExpiresAt);
+		return new BingoVerifyResponse(cellId, BingoCellStatus.PENDING.name(), opponentUser.getUserName(), opponentCode,
+			formattedExpiresAt);
 	}
 
 	@Transactional
@@ -152,7 +169,7 @@ public class BingoService {
 		myCell.setPendingExpiresAt(null);
 		bingoCellRepository.save(myCell);
 
-		return new BingoVerifyResponse(cellId, BingoCellStatus.INCOMPLETE.name(), null, null);
+		return new BingoVerifyResponse(cellId, BingoCellStatus.INCOMPLETE.name(), null, null, null);
 	}
 
 	private void expireIfNeeded(BingoCell cell) {
@@ -166,12 +183,13 @@ public class BingoService {
 		}
 	}
 
-	private BingoCellResponse toCellResponse(BingoCell cell) {
-		String matchedWithName = cell.getStatus() == BingoCellStatus.COMPLETED && cell.getMatchedUser() != null
-			? cell.getMatchedUser().getUserName()
-			: null;
+	/** PENDING 이면 요청을 보낸 상대, COMPLETED 면 함께 완료한 상대의 이름·코드를 내려준다. */
+	private BingoCellResponse toCellResponse(BingoCell cell, Map<Long, String> codeByUserId) {
+		User matchedUser = cell.getMatchedUser();
+		String matchedWithName = matchedUser != null ? matchedUser.getUserName() : null;
+		String matchedWithCode = matchedUser != null ? codeByUserId.get(matchedUser.getId()) : null;
 		return new BingoCellResponse(cell.getPosition(), cell.getMission().getDescription(),
-			cell.getStatus().name(), matchedWithName);
+			cell.getStatus().name(), matchedWithName, matchedWithCode);
 	}
 
 	private Bingo createBingoBoard(User user) {

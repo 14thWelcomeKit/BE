@@ -1,5 +1,7 @@
 package com.likelion13th.Welcomekit_BE.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +13,8 @@ public interface BingoRepository extends JpaRepository<Bingo, Long> {
 	Optional<Bingo> findByUser(User user);
 
 	Optional<Bingo> findByCode(String code);
+
+	List<Bingo> findByUserIn(Collection<User> users);
 
 	boolean existsByCode(String code);
 }

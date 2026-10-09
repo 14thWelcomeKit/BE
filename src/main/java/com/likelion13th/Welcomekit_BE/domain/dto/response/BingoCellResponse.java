@@ -10,4 +10,5 @@ public class BingoCellResponse {
 	private String missionContent;
 	private String status;
 	private String matchedWithName;
+	private String matchedWithCode;
 }
